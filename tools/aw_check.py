@@ -3,6 +3,9 @@
 
 An AW entry naming a class/member that no longer exists is a HARD mod-load failure,
 so this has to pass before the client will even reach the main menu.
+
+Usage: aw_check.py <file.accesswidener> [<file.accesswidener> ...]
+Run with no arguments it used to check nothing and still exit 0, which reads as a pass.
 """
 import re
 import subprocess
@@ -11,6 +14,9 @@ import zipfile
 
 JAR = "/Users/bee/.gradle/caches/fabric-loom/26.2/minecraft-client.jar"
 AW_FILES = sys.argv[1:]
+
+if not AW_FILES:
+    sys.exit("usage: aw_check.py <file.accesswidener> ...  (no files given: nothing was checked)")
 
 zf = zipfile.ZipFile(JAR)
 classes = {n[:-6] for n in zf.namelist() if n.endswith(".class")}

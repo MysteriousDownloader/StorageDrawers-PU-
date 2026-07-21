@@ -42,7 +42,7 @@ public class ConfigItemList
         if(!listedNamespaces.isEmpty()) {
             ResourceKey<Item> resourceKey = BuiltInRegistries.ITEM.getResourceKey(item).orElse(null);
             if (resourceKey != null) {
-                String namespace = resourceKey.location().getNamespace();
+                String namespace = resourceKey.identifier().getNamespace();
                 if (listedNamespaces.contains(namespace))
                     return true;
             }

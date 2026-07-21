@@ -8,12 +8,15 @@ import com.jaquadro.minecraft.storagedrawers.core.ModItems;
 import com.jaquadro.minecraft.storagedrawers.core.ModRecipes;
 import com.jaquadro.minecraft.storagedrawers.item.ItemDetachedDrawer;
 import com.jaquadro.minecraft.storagedrawers.item.ItemUpgradeStorage;
+import com.jaquadro.minecraft.storagedrawers.ModServices;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -25,21 +28,47 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class UpgradeDetachedDrawerRecipe extends CustomRecipe
 {
-    public UpgradeDetachedDrawerRecipe (CraftingBookCategory cat) {
-        super(cat);
+    private static UpgradeDetachedDrawerRecipe instance;
+
+    // Singleton: StreamCodec must hand back the same instance the MapCodec produces.
+    public static UpgradeDetachedDrawerRecipe instance () {
+        if (instance == null)
+            instance = new UpgradeDetachedDrawerRecipe();
+        return instance;
     }
+
+    public static RecipeSerializer<UpgradeDetachedDrawerRecipe> makeSerializer () {
+        return new RecipeSerializer<>(
+            MapCodec.unit((Supplier<UpgradeDetachedDrawerRecipe>) UpgradeDetachedDrawerRecipe::instance),
+            StreamCodec.<RegistryFriendlyByteBuf, UpgradeDetachedDrawerRecipe>of((buf, val) -> { }, buf -> instance()));
+    }
+
+    // Recipe.assemble no longer receives a HolderLookup.Provider in 26.2, but the drawer
+    // NBT round-trip needs one. Vanilla always calls matches() first, so stash it there.
+    private HolderLookup.Provider lastRegistries;
+
+    public UpgradeDetachedDrawerRecipe () { }
 
     @Override
     public boolean matches(@NotNull CraftingInput inv, @NotNull Level world) {
+        lastRegistries = world.registryAccess();
         return findContext(inv) != null;
     }
 
     @Override
     @NotNull
-    public ItemStack assemble(@NotNull CraftingInput inv, HolderLookup.Provider access) {
+    public ItemStack assemble(@NotNull CraftingInput inv) {
+        HolderLookup.Provider access = lastRegistries;
+        if (access == null) {
+            ModServices.reportOnce("UpgradeDetachedDrawerRecipe.assemble", new IllegalStateException(
+                "assemble() called without a preceding matches(); no registry access available"));
+            return ItemStack.EMPTY;
+        }
+
         Context ctx = findContext(inv);
         if (ctx == null)
             return ItemStack.EMPTY;

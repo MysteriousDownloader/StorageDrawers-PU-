@@ -5,10 +5,11 @@ import com.jaquadro.minecraft.storagedrawers.core.ModItems;
 import com.jaquadro.minecraft.storagedrawers.core.ModRecipes;
 import com.jaquadro.minecraft.storagedrawers.core.ModSecurity;
 import com.jaquadro.minecraft.storagedrawers.item.ItemPersonalKey;
-import net.minecraft.core.HolderLookup;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -16,12 +17,27 @@ import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class PersonalKeyRecipe extends CustomRecipe
 {
-    public PersonalKeyRecipe (CraftingBookCategory cat) {
-        super(cat);
+    private static PersonalKeyRecipe instance;
+
+    // Singleton: StreamCodec must hand back the same instance the MapCodec produces.
+    // Safe here because the recipe's shape is resolved from config at call time, not construction.
+    public static PersonalKeyRecipe instance () {
+        if (instance == null)
+            instance = new PersonalKeyRecipe();
+        return instance;
     }
+
+    public static RecipeSerializer<PersonalKeyRecipe> makeSerializer () {
+        return new RecipeSerializer<>(
+            MapCodec.unit((Supplier<PersonalKeyRecipe>) PersonalKeyRecipe::instance),
+            StreamCodec.<RegistryFriendlyByteBuf, PersonalKeyRecipe>of((buf, val) -> { }, buf -> instance()));
+    }
+
+    public PersonalKeyRecipe () { }
 
     @Override
     public boolean matches (CraftingInput craftingInput, Level level) {
@@ -70,7 +86,7 @@ public class PersonalKeyRecipe extends CustomRecipe
     }
 
     @Override
-    public ItemStack assemble (CraftingInput inv, HolderLookup.Provider registries) {
+    public ItemStack assemble (CraftingInput inv) {
         ItemStack pkey = findPersonalKey(inv);
 
         List<Item> cycle = new ArrayList<>();

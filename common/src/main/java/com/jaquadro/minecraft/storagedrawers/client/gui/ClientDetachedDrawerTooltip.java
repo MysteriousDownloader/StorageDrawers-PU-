@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
@@ -43,7 +42,7 @@ public class ClientDetachedDrawerTooltip implements ClientTooltipComponent
     }
 
     @Override
-    public void renderImage(Font font, int pX, int pY, int pW, int pH, GuiGraphicsExtractor graphics) {
+    public void extractImage(Font font, int pX, int pY, int pW, int pH, GuiGraphicsExtractor graphics) {
         boolean forceCapCheck = ModCommonConfig.INSTANCE.DRAWERS.detached.forceMaxCapacityCheck.get();
         int bgY = forceCapCheck ? 0 : 24;
 
@@ -61,6 +60,6 @@ public class ClientDetachedDrawerTooltip implements ClientTooltipComponent
 
     private void renderSlot(int pX, int pY, GuiGraphicsExtractor graphics, Font font) {
         ItemStack itemstack = this.item;
-        graphics.renderItem(itemstack, pX + 1, pY + 1, 0);
+        graphics.item(itemstack, pX + 1, pY + 1, 0);
     }
 }

@@ -1,18 +1,21 @@
 package com.jaquadro.minecraft.storagedrawers.core.recipe;
 
+import com.jaquadro.minecraft.storagedrawers.ModServices;
 import com.jaquadro.minecraft.storagedrawers.block.tile.tiledata.UpgradeData;
 import com.jaquadro.minecraft.storagedrawers.core.ModItems;
 import com.jaquadro.minecraft.storagedrawers.core.ModRecipes;
 import com.jaquadro.minecraft.storagedrawers.item.ItemDrawers;
 import com.jaquadro.minecraft.storagedrawers.item.ItemUpgrade;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -25,21 +28,48 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class AddUpgradeRecipe extends CustomRecipe
 {
-    public AddUpgradeRecipe (CraftingBookCategory cat) {
-        super(cat);
+    private static AddUpgradeRecipe instance;
+
+    // The recipe object is a singleton: StreamCodec must hand back the same instance the
+    // MapCodec produces, and construction is deferred past registry-init.
+    public static AddUpgradeRecipe instance () {
+        if (instance == null)
+            instance = new AddUpgradeRecipe();
+        return instance;
     }
+
+    public static RecipeSerializer<AddUpgradeRecipe> makeSerializer () {
+        return new RecipeSerializer<>(
+            MapCodec.unit((Supplier<AddUpgradeRecipe>) AddUpgradeRecipe::instance),
+            StreamCodec.<RegistryFriendlyByteBuf, AddUpgradeRecipe>of((buf, val) -> { }, buf -> instance()));
+    }
+
+    // Recipe.assemble no longer receives a HolderLookup.Provider in 26.2, but the upgrade
+    // NBT round-trip needs one. Vanilla always calls matches() first, so stash it there.
+    private HolderLookup.Provider lastRegistries;
+
+    public AddUpgradeRecipe () { }
 
     @Override
     public boolean matches(@NotNull CraftingInput inv, @NotNull Level world) {
-        return findContext(inv, world.registryAccess()) != null;
+        lastRegistries = world.registryAccess();
+        return findContext(inv, lastRegistries) != null;
     }
 
     @Override
     @NotNull
-    public ItemStack assemble(@NotNull CraftingInput inv, HolderLookup.Provider registries) {
+    public ItemStack assemble(@NotNull CraftingInput inv) {
+        HolderLookup.Provider registries = lastRegistries;
+        if (registries == null) {
+            ModServices.reportOnce("AddUpgradeRecipe.assemble", new IllegalStateException(
+                "assemble() called without a preceding matches(); no registry access available"));
+            return ItemStack.EMPTY;
+        }
+
         Context ctx = findContext(inv, registries);
         if (ctx == null)
             return ItemStack.EMPTY;

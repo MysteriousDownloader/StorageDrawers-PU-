@@ -3,19 +3,41 @@ package com.jaquadro.minecraft.storagedrawers.core.recipe;
 import com.jaquadro.minecraft.storagedrawers.core.ModDataComponents;
 import com.jaquadro.minecraft.storagedrawers.core.ModItems;
 import com.jaquadro.minecraft.storagedrawers.core.ModRecipes;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Supplier;
 
 public class RemoteGroupUpgradeRecipe extends ShapedRecipe
 {
-    public RemoteGroupUpgradeRecipe (CraftingBookCategory cat) {
-        super("", cat, pattern(), new ItemStack(ModItems.REMOTE_GROUP_UPGRADE_BOUND.get()));
+    private static RemoteGroupUpgradeRecipe instance;
+
+    // Lazy singleton: the constructor dereferences ModItems, so construction must stay
+    // deferred past registry-init; and StreamCodec must hand back the same instance the
+    // MapCodec produces.
+    public static RemoteGroupUpgradeRecipe instance () {
+        if (instance == null)
+            instance = new RemoteGroupUpgradeRecipe();
+        return instance;
+    }
+
+    public static RecipeSerializer<ShapedRecipe> makeSerializer () {
+        return new RecipeSerializer<>(
+            MapCodec.unit((Supplier<ShapedRecipe>) RemoteGroupUpgradeRecipe::instance),
+            StreamCodec.<RegistryFriendlyByteBuf, ShapedRecipe>of((buf, val) -> { }, buf -> instance()));
+    }
+
+    public RemoteGroupUpgradeRecipe () {
+        super(new Recipe.CommonInfo(true),
+            new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, ""),
+            pattern(),
+            new ItemStackTemplate(ModItems.REMOTE_GROUP_UPGRADE_BOUND.get()));
     }
 
     private static ShapedRecipePattern pattern () {
@@ -26,7 +48,7 @@ public class RemoteGroupUpgradeRecipe extends ShapedRecipe
     }
 
     @Override
-    public ItemStack assemble (CraftingInput inv, HolderLookup.Provider registries) {
+    public ItemStack assemble (CraftingInput inv) {
         ItemStack center = inv.getItem(1);
         if (center == ItemStack.EMPTY)
             center = inv.getItem(4);
@@ -43,7 +65,7 @@ public class RemoteGroupUpgradeRecipe extends ShapedRecipe
     }
 
     @Override
-    public RecipeSerializer<? extends ShapedRecipe>  getSerializer () {
+    public RecipeSerializer<ShapedRecipe> getSerializer () {
         return ModRecipes.REMOTE_GROUP_UPGRADE_SERIALIZER.get();
     }
 }

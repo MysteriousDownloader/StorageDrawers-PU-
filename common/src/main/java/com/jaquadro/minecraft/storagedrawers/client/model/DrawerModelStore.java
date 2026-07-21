@@ -367,7 +367,7 @@ public class DrawerModelStore
 
         BlockStateModel storedModel = modelStore.getOrDefault(state, null);
         if (storedModel == null) {
-            return Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state);
+            return Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
         } else {
             return storedModel;
         }
@@ -418,7 +418,7 @@ public class DrawerModelStore
         if (replacementModel == null)
             return model;
 
-        BlockStateModel merged = new SpriteReplacementModel(model, replacementModel, ChunkSectionLayer.CUTOUT_MIPPED);
+        BlockStateModel merged = new SpriteReplacementModel(model, replacementModel, ChunkSectionLayer.CUTOUT);
         store.put(replaceLoc, merged);
         return merged;
     }

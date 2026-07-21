@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
 public class ComponentUtil
 {
     public static List<MutableComponent> getSplitDescription (Item item) {
-        Component description = item.getName();
+        Component description = new ItemStack(item).getItemName();
         if (description.equals(Component.empty()))
             return new LinkedList<>();
 

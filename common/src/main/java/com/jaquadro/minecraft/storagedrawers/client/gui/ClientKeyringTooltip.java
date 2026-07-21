@@ -3,11 +3,9 @@ package com.jaquadro.minecraft.storagedrawers.client.gui;
 import com.jaquadro.minecraft.storagedrawers.components.item.KeyringContents;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -66,7 +64,7 @@ public class ClientKeyringTooltip implements ClientTooltipComponent
     }
 
     @Override
-    public void renderImage(Font font, int pX, int pY, int pW, int pH, GuiGraphicsExtractor graphics) {
+    public void extractImage(Font font, int pX, int pY, int pW, int pH, GuiGraphicsExtractor graphics) {
         if (this.contents.isEmpty()) {
             this.renderEmptyBundleTooltip(font, pX, pY, pW, pH, graphics);
         } else {
@@ -121,7 +119,7 @@ public class ClientKeyringTooltip implements ClientTooltipComponent
     }
 
     private static void renderCount(int x, int y, int hiddenCount, Font font, GuiGraphicsExtractor graphics) {
-        graphics.drawCenteredString(font, "+" + hiddenCount, x + 12, y + 10, -1);
+        graphics.centeredText(font, "+" + hiddenCount, x + 12, y + 10, -1);
     }
 
     private void renderSlot(int index, int pX, int pY, List<ItemStack> items, int renderIndex, Font font, GuiGraphicsExtractor graphics) {
@@ -133,7 +131,7 @@ public class ClientKeyringTooltip implements ClientTooltipComponent
         else
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_BACKGROUND_SPRITE, pX, pY, SLOT_SIZE, SLOT_SIZE);
 
-        graphics.renderItem(item, pX + SLOT_MARGIN, pY + SLOT_MARGIN, renderIndex);
+        graphics.item(item, pX + SLOT_MARGIN, pY + SLOT_MARGIN, renderIndex);
         graphics.itemDecorations(font, item, pX + SLOT_MARGIN, pY + SLOT_MARGIN);
         if (selected)
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_HIGHLIGHT_FRONT_SPRITE, pX, pY, 24, 24);
@@ -146,7 +144,7 @@ public class ClientKeyringTooltip implements ClientTooltipComponent
             int textWidth = font.width(hoverComponent.getVisualOrderText());
             int textOffset = pX + pW / 2 - 12;
             ClientTooltipComponent tooltip = ClientTooltipComponent.create(hoverComponent.getVisualOrderText());
-            graphics.renderTooltip(font, List.of(tooltip), textOffset - textWidth / 2, pY - 15, DefaultTooltipPositioner.INSTANCE, item.get(DataComponents.TOOLTIP_STYLE));
+            graphics.tooltip(font, List.of(tooltip), textOffset - textWidth / 2, pY - 15, DefaultTooltipPositioner.INSTANCE, item.get(DataComponents.TOOLTIP_STYLE));
         }
 
     }

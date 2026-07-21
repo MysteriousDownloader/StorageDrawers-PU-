@@ -6,18 +6,42 @@ import com.jaquadro.minecraft.storagedrawers.core.ModItems;
 import com.jaquadro.minecraft.storagedrawers.core.ModRecipes;
 import com.jaquadro.minecraft.storagedrawers.item.ItemKey;
 import com.jaquadro.minecraft.storagedrawers.item.ItemKeyring;
-import net.minecraft.core.HolderLookup;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class KeyringRecipe extends ShapedRecipe
 {
-    public KeyringRecipe (CraftingBookCategory cat) {
-        super("", cat, pattern(), new ItemStack(ModItems.KEYRING.get()));
+    private static KeyringRecipe instance;
+
+    // Lazy singleton: the constructor dereferences ModItems, so construction must stay
+    // deferred past registry-init; and StreamCodec must hand back the same instance the
+    // MapCodec produces.
+    public static KeyringRecipe instance () {
+        if (instance == null)
+            instance = new KeyringRecipe();
+        return instance;
+    }
+
+    public static RecipeSerializer<ShapedRecipe> makeSerializer () {
+        return new RecipeSerializer<>(
+            MapCodec.unit((Supplier<ShapedRecipe>) KeyringRecipe::instance),
+            StreamCodec.<RegistryFriendlyByteBuf, ShapedRecipe>of((buf, val) -> { }, buf -> instance()));
+    }
+
+    public KeyringRecipe () {
+        super(new Recipe.CommonInfo(true),
+            new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, ""),
+            pattern(),
+            new ItemStackTemplate(ModItems.KEYRING.get()));
     }
 
     private static ShapedRecipePattern pattern () {
@@ -28,7 +52,7 @@ public class KeyringRecipe extends ShapedRecipe
     }
 
     @Override
-    public ItemStack assemble (CraftingInput inv, HolderLookup.Provider registries) {
+    public ItemStack assemble (CraftingInput inv) {
         ItemStack center = inv.getItem(4);
         if (center.isEmpty() || !(center.getItem() instanceof ItemKey))
             return ItemStack.EMPTY;
@@ -49,7 +73,7 @@ public class KeyringRecipe extends ShapedRecipe
     }
 
     @Override
-    public RecipeSerializer<? extends ShapedRecipe> getSerializer () {
+    public RecipeSerializer<ShapedRecipe> getSerializer () {
         return ModRecipes.KEYRING_RECIPE_SERIALIZER.get();
     }
 }

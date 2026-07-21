@@ -19,11 +19,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -35,7 +32,7 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Style;
@@ -262,7 +259,7 @@ public class BlockEntityDrawersRenderer implements BlockEntityRenderer<BlockEnti
         alignRendering(poseStack, side);
 
         QuadBuilder quadBuilder = new QuadBuilder(renderState);
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderType.solid(), quadBuilder);
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.solidMovingBlock(), quadBuilder);
 
         poseStack.popPose();
     }
@@ -275,11 +272,11 @@ public class BlockEntityDrawersRenderer implements BlockEntityRenderer<BlockEnti
         public static final Identifier TEXTURE_IND_COMP_3 = ModConstants.loc("block/indicator/indicator_comp_on");
         public static final Identifier TEXTURE_IND_COMP_2 = ModConstants.loc("block/indicator/indicator_comp2_on");
 
-        public static final Material MAT_IND_1 = new Material(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_1);
-        public static final Material MAT_IND_2 = new Material(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_2);
-        public static final Material MAT_IND_4 = new Material(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_4);
-        public static final Material MAT_IND_COMP_3 = new Material(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_COMP_3);
-        public static final Material MAT_IND_COMP_2 = new Material(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_COMP_2);
+        public static final SpriteId SPRITE_IND_1 = new SpriteId(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_1);
+        public static final SpriteId SPRITE_IND_2 = new SpriteId(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_2);
+        public static final SpriteId SPRITE_IND_4 = new SpriteId(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_4);
+        public static final SpriteId SPRITE_IND_COMP_3 = new SpriteId(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_COMP_3);
+        public static final SpriteId SPRITE_IND_COMP_2 = new SpriteId(TextureAtlas.LOCATION_BLOCKS, TEXTURE_IND_COMP_2);
 
         DrawersRenderState renderState;
 
@@ -296,13 +293,13 @@ public class BlockEntityDrawersRenderer implements BlockEntityRenderer<BlockEnti
             if (renderState.blockState.getBlock() instanceof BlockCompDrawers)
                 count = 1;
 
-            Material mat = MAT_IND_1;
+            SpriteId mat = SPRITE_IND_1;
             if (renderState.blockState.getBlock() instanceof BlockCompDrawers)
-                mat = renderState.items.size() == 2 ? MAT_IND_COMP_2 : MAT_IND_COMP_3;
+                mat = renderState.items.size() == 2 ? SPRITE_IND_COMP_2 : SPRITE_IND_COMP_3;
             else if (count == 2)
-                mat = MAT_IND_2;
+                mat = SPRITE_IND_2;
             else if (count == 4)
-                mat = MAT_IND_4;
+                mat = SPRITE_IND_4;
 
             TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(mat);
             SpriteContents contents = sprite.contents();
