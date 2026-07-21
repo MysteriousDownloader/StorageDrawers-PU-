@@ -1,7 +1,7 @@
 package com.jaquadro.minecraft.storagedrawers.inventory;
 
 import com.jaquadro.minecraft.storagedrawers.ModConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -27,19 +27,19 @@ public class FramingTableScreen extends AbstractContainerScreen<ContainerFraming
     }
 
     @Override
-    public void render (@NotNull GuiGraphics graphics, int x, int y, float f) {
+    public void render (@NotNull GuiGraphicsExtractor graphics, int x, int y, float f) {
         super.render(graphics, x, y, f);
         this.renderTooltip(graphics, x, y);
     }
 
     @Override
-    protected void renderLabels (GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(this.font, this.title, 8, 6, 0xFF404040, false);
-        graphics.drawString(this.font, this.inventory.getDisplayName().getString(), 8, this.imageHeight - 96 + 2, 0xFF404040, false);
+    protected void renderLabels (GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(this.font, this.title, 8, 6, 0xFF404040, false);
+        graphics.text(this.font, this.inventory.getDisplayName().getString(), 8, this.imageHeight - 96 + 2, 0xFF404040, false);
     }
 
     @Override
-    protected void renderBg (GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg (GuiGraphicsExtractor graphics, float partialTicks, int mouseX, int mouseY) {
         int guiX = (width - imageWidth) / 2;
         int guiY = (height - imageHeight) / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, background, guiX, guiY, 0, 0, imageWidth, imageHeight, 256, 256);

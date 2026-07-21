@@ -3,8 +3,7 @@ package com.jaquadro.minecraft.storagedrawers.client.gui;
 import com.jaquadro.minecraft.storagedrawers.inventory.ItemStackHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.ARGB;
@@ -13,36 +12,33 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class StorageGuiGraphics extends GuiGraphics
+public class StorageGuiGraphics extends GuiGraphicsExtractor
 {
     private final Minecraft minecraft;
-    private GuiGraphics baseGraphics;
+    private GuiGraphicsExtractor baseGraphics;
 
     @NotNull
     public ItemStack overrideStack;
 
-    public StorageGuiGraphics (Minecraft minecraft, GuiRenderState renderState) {
-        super(minecraft, renderState);
-
-        this.minecraft = minecraft;
-        overrideStack = ItemStack.EMPTY;
-    }
-
-    public StorageGuiGraphics (Minecraft minecraft, GuiGraphics graphics) {
-        super(minecraft, graphics.pose(), minecraft.gameRenderer.guiRenderState);
+    public StorageGuiGraphics (Minecraft minecraft, GuiGraphicsExtractor graphics) {
+        // guiRenderState moved off GameRenderer onto Gui in 26.2, and the pose-carrying
+        // constructor gained explicit gui dimensions. Both are access-widened.
+        super(minecraft, graphics.pose(), minecraft.gui.guiRenderState,
+            graphics.guiWidth(), graphics.guiHeight());
 
         this.baseGraphics = graphics;
         this.minecraft = minecraft;
         this.overrideStack = ItemStack.EMPTY;
     }
 
-    public GuiGraphics baseGraphics () {
+    public GuiGraphicsExtractor baseGraphics () {
         return baseGraphics;
     }
 
-    public void renderItemDecorations(Font font, ItemStack item, int x, int y, @Nullable String text) {
+    @Override
+    public void itemDecorations(Font font, ItemStack item, int x, int y, @Nullable String text) {
         if (item != overrideStack) {
-            super.renderItemDecorations(font, item, x, y, text);
+            super.itemDecorations(font, item, x, y, text);
             return;
         }
 
@@ -102,7 +98,7 @@ public class StorageGuiGraphics extends GuiGraphics
             pose().pushMatrix();
             pose().scale(scale, scale);
 
-            this.drawString(font, text, textX, textY, color, true);
+            this.text(font, text, textX, textY, color, true);
             pose().popMatrix();
         }
 

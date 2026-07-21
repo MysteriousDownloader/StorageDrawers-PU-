@@ -76,6 +76,7 @@ public class BlockEntityDrawersRenderer implements BlockEntityRenderer<BlockEnti
     public void extractRenderState (BlockEntityDrawers blockEntity, DrawersRenderState renderState, float partialTick, Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumbleOverlay) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPos, crumbleOverlay);
 
+        renderState.blockState = blockEntity.getBlockState();
         renderState.cameraPos = cameraPos;
         renderState.enforcedLightLevel = blockEntity.upgrades().hasIlluminationUpgrade()
             ? ModCommonConfig.INSTANCE.UPGRADES.illuminationUpgrade.illuminationLevel.get()

@@ -10,14 +10,16 @@ accessWidener   v1  official
 #   BlockModel.getElements -> BlockModel is now an interface; the JSON model type is
 #     net.minecraft.client.resources.model.cuboid.CuboidModel, a record whose
 #     geometry() accessor is already public. No widening needed.
-#   GuiGraphics.<init> -> GuiGraphics is now GuiGraphicsExtractor, and its
-#     (Minecraft, GuiRenderState, int, int) constructor is public. No widening needed.
+#   GuiGraphics.<init> -> GuiGraphics is now GuiGraphicsExtractor. Its 4-arg
+#     (Minecraft, GuiRenderState, int, int) constructor is public, but StorageGuiGraphics
+#     needs the pose-carrying 5-arg one, which is private — hence the entry below.
 
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 
 accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+accessible method net/minecraft/client/gui/GuiGraphicsExtractor <init> (Lnet/minecraft/client/Minecraft;Lorg/joml/Matrix3x2fStack;Lnet/minecraft/client/renderer/state/gui/GuiRenderState;II)V
 
 accessible field net/minecraft/world/item/crafting/RecipeManager recipes Lnet/minecraft/world/item/crafting/RecipeMap;
 accessible field net/minecraft/world/item/crafting/ShapedRecipe pattern Lnet/minecraft/world/item/crafting/ShapedRecipePattern;

@@ -2,6 +2,7 @@ package com.jaquadro.minecraft.storagedrawers.client.renderer.state;
 
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
@@ -9,6 +10,10 @@ import java.util.List;
 
 public class DrawersRenderState extends BlockEntityRenderState
 {
+    // BlockEntityRenderState.blockState became private in 26.2 with no accessor, so
+    // renderers that need the state must capture it themselves during extraction.
+    public BlockState blockState;
+
     public Vec3 cameraPos;
     public int enforcedLightLevel;
     public List<SlotState> items = Collections.emptyList();

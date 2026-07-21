@@ -43,6 +43,8 @@ public class BlockEntityFramingRenderer implements BlockEntityRenderer<BlockEnti
     public void extractRenderState (BlockEntityFramingTable blockEntity, FramingRenderState renderState, float partialTick, Vec3 cameraPos, @Nullable ModelFeatureRenderer.CrumblingOverlay crumbleOverlay) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPos, crumbleOverlay);
 
+        renderState.blockState = blockEntity.getBlockState();
+
         int longPos = (int)blockEntity.getBlockPos().asLong();
 
         MaterialData matData = blockEntity.material();

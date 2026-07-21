@@ -77,6 +77,9 @@ tasks {
     named<JavaCompile>("compileJava").configure {
         options.encoding = StandardCharsets.UTF_8.toString()
         options.release.set(Versions.java.toInt())
+        // javac stops reporting at 100 errors by default, which reads as a plateau and
+        // hides whether the port is actually converging. Report them all.
+        options.compilerArgs.addAll(listOf("-Xmaxerrs", "10000"))
     }
     named<Javadoc>("javadoc").configure {
         options {

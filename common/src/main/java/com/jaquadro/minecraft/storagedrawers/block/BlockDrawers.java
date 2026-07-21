@@ -348,7 +348,7 @@ public abstract class BlockDrawers extends FaceSlotBlock implements INetworked, 
                 if (item.getCount() <= 0)
                     context.player.getInventory().setItem(context.player.getInventory().getSelectedSlot(), ItemStack.EMPTY);
                 context.level.playSound(null, context.pos, SoundEvents.WOOD_PLACE, SoundSource.PLAYERS, .2f,
-                    ((context.level.random.nextFloat() - context.level.random.nextFloat()) * .7f + 1) * 2);
+                    ((context.level.getRandom().nextFloat() - context.level.getRandom().nextFloat()) * .7f + 1) * 2);
             }
 
             return Optional.of(InteractionResult.SUCCESS);
@@ -364,7 +364,7 @@ public abstract class BlockDrawers extends FaceSlotBlock implements INetworked, 
                 if (item.getCount() <= 0)
                     context.player.getInventory().setItem(context.player.getInventory().getSelectedSlot(), ItemStack.EMPTY);
                 context.level.playSound(null, context.pos, SoundEvents.WOOD_PLACE, SoundSource.PLAYERS, .2f,
-                    ((context.level.random.nextFloat() - context.level.random.nextFloat()) * .7f + 1) * 2);
+                    ((context.level.getRandom().nextFloat() - context.level.getRandom().nextFloat()) * .7f + 1) * 2);
             }
 
             return Optional.of(InteractionResult.SUCCESS);
@@ -500,7 +500,7 @@ public abstract class BlockDrawers extends FaceSlotBlock implements INetworked, 
                 context.level.sendBlockUpdated(context.pos, context.state, context.state, Block.UPDATE_ALL);
             } else
                 context.level.playSound(null, context.pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f,
-                    ((context.level.random.nextFloat() - context.level.random.nextFloat()) * .7f + 1) * 2);
+                    ((context.level.getRandom().nextFloat() - context.level.getRandom().nextFloat()) * .7f + 1) * 2);
         }
 
         return InteractionResult.SUCCESS;
@@ -580,7 +580,7 @@ public abstract class BlockDrawers extends FaceSlotBlock implements INetworked, 
             }
             else
                 context.level.playSound(null, context.pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f,
-                    ((context.level.random.nextFloat() - context.level.random.nextFloat()) * .7f + 1) * 2);
+                    ((context.level.getRandom().nextFloat() - context.level.getRandom().nextFloat()) * .7f + 1) * 2);
         }
     }
 
