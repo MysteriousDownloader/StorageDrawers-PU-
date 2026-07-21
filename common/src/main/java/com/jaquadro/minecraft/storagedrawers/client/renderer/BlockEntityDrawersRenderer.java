@@ -1,6 +1,7 @@
 package com.jaquadro.minecraft.storagedrawers.client.renderer;
 
 import com.jaquadro.minecraft.storagedrawers.ModConstants;
+import com.jaquadro.minecraft.storagedrawers.ModServices;
 import com.jaquadro.minecraft.storagedrawers.api.storage.Drawers;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerAttributes;
@@ -235,7 +236,7 @@ public class BlockEntityDrawersRenderer implements BlockEntityRenderer<BlockEnti
 
             //this.itemRenderState.render(matrix, buffer, combinedLight, combinedOverlay);
         } catch (Exception e) {
-            // Shrug
+            ModServices.reportOnce("BlockEntityDrawersRenderer.renderItem", e);
         }
 
         poseStack.popPose();

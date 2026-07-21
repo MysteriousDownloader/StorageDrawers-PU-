@@ -1,5 +1,6 @@
 package com.jaquadro.minecraft.storagedrawers.client.renderer;
 
+import com.jaquadro.minecraft.storagedrawers.ModServices;
 import com.jaquadro.minecraft.storagedrawers.api.framing.IFramedSourceBlock;
 import com.jaquadro.minecraft.storagedrawers.block.*;
 import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityFramingTable;
@@ -111,7 +112,9 @@ public class BlockEntityFramingRenderer implements BlockEntityRenderer<BlockEnti
 
         try {
             itemState.submit(poseStack, submitNodeCollector, renderState.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            ModServices.reportOnce("BlockEntityFramingRenderer.submitItem", e);
+        }
 
         poseStack.popPose();
     }

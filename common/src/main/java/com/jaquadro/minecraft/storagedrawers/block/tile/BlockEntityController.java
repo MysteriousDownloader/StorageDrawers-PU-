@@ -277,7 +277,7 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
                         getLevel().scheduleTick(pos, blockEntity.getBlockState().getBlock(), 1);
                     }
                 } catch (Exception e) {
-                    // Ignore
+                    ModServices.reportOnce("BlockEntityController.setRemoved.scheduleTick", e);
                 }
             }
 
@@ -315,7 +315,9 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
                 }
             }
         } catch (Exception e) {
-            // Ignore
+            // Touches the access-widened LevelTicks.allContainers — a prime suspect if
+            // controller binding silently stops validating after a version bump.
+            ModServices.reportOnce("BlockEntityController.scheduleValidationTick", e);
         }
     }
 

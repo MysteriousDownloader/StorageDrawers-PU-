@@ -2,6 +2,7 @@ package com.jaquadro.minecraft.storagedrawers.client.model;
 
 import com.google.common.base.Suppliers;
 import com.jaquadro.minecraft.storagedrawers.ModConstants;
+import com.jaquadro.minecraft.storagedrawers.ModServices;
 import com.jaquadro.minecraft.storagedrawers.block.tile.modelprops.DrawerModelProperties;
 import com.jaquadro.minecraft.storagedrawers.block.tile.modelprops.FramedModelProperties;
 import com.jaquadro.minecraft.storagedrawers.block.tile.tiledata.MaterialData;
@@ -120,7 +121,11 @@ public class PlatformDecoratedModel<C extends ModelContext> extends ParentModel 
             decorator.emitQuads(supplier, emitModelOpaque, DecoratorRenderType.SOLID);
             decorator.emitQuads(supplier, emitModelCutout, DecoratorRenderType.CUTOUT);
             decorator.emitQuads(supplier, emitModelTransparent, DecoratorRenderType.TRANSLUCENT);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // The entire framed/decorated geometry path. If this fires, drawers render
+            // as bare or missing blocks with no other symptom.
+            ModServices.reportOnce("PlatformDecoratedModel.emitQuads", e);
+        }
     }
 
     private Mesh getMesh (BlockStateModel model, BlockState state, RandomSource randomSource, DecoratorRenderType renderType) {

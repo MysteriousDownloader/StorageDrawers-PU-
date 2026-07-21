@@ -5,10 +5,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ModServices
 {
     public static final Logger log = LogManager.getLogger();
+
+    private static final Set<String> reportedSites = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Reports an exception from a call site that must not abort its caller, exactly once per
+     * site. Several of these sites sit in the render loop or block entity tick, so an
+     * unthrottled log would flood; swallowing silently instead is how version-port breakage
+     * turns into invisible visual and behavioural regressions.
+     */
+    public static void reportOnce (String site, Throwable t) {
+        if (reportedSites.add(site))
+            log.error("[{}] failed; further occurrences at this site are suppressed", site, t);
+    }
 
     public static final ResourceFactory RESOURCE_FACTORY = load(ResourceFactory.class);
 

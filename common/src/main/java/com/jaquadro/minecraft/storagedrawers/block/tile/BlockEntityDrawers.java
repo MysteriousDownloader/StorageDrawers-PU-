@@ -280,9 +280,13 @@ public abstract class BlockEntityDrawers extends BaseBlockEntity implements IDra
                     }
                 }
             } catch (Exception e) {
-                // Ignore
+                // Touches the access-widened LevelTicks.allContainers — a prime suspect if
+                // drawers silently stop validating their controller binding after a bump.
+                ModServices.reportOnce("BlockEntityDrawers.onEntityLoad.allContainers", e);
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            ModServices.reportOnce("BlockEntityDrawers.onEntityLoad", e);
+        }
     }
 
     private void scheduleConditionalTick (int tick) {
@@ -293,7 +297,9 @@ public abstract class BlockEntityDrawers extends BaseBlockEntity implements IDra
                 return;
 
             getLevel().scheduleTick(pos, getBlockState().getBlock(), tick);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            ModServices.reportOnce("BlockEntityDrawers.scheduleConditionalTick", e);
+        }
     }
 
     @Override

@@ -141,7 +141,12 @@ public class BlockEntityFramingTable extends BaseBlockEntity implements Nameable
             try {
                 if (!Block.isShapeFullBlock(state.getShape(null, null)))
                     return false;
-            } catch (Exception e) { }
+            } catch (Exception e) {
+                // Intentionally silent, and NOT a reportOnce site: probing getShape with a
+                // null level/pos throws for any block whose shape is position-dependent.
+                // That is an expected, frequent outcome here — such a block simply isn't
+                // provably a full cube, so it falls through to the remaining checks.
+            }
         }
 
         if (ModCommonConfig.INSTANCE.DRAWERS.framed.enforceOpaqueMaterials.get()) {

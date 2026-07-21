@@ -21,6 +21,8 @@ plugins {
 
 rootProject.name = "StorageDrawers"
 include("common")
-include("forge")
-include("neoforge")
+// Scoped out for the 26.2 Fabric port — both platforms do have 26.2 builds
+// (NeoForge 26.2.0.28-beta, Forge 26.2-65.0.7); re-enable once Fabric is green.
+//include("forge")
+//include("neoforge")
 include("fabric")
