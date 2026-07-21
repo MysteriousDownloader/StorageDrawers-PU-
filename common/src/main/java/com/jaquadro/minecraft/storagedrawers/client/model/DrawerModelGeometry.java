@@ -4,10 +4,11 @@ import com.jaquadro.minecraft.storagedrawers.ModConstants;
 import com.jaquadro.minecraft.storagedrawers.block.BlockCompDrawers;
 import com.jaquadro.minecraft.storagedrawers.block.BlockDrawers;
 import com.jaquadro.minecraft.storagedrawers.core.ModBlocks;
+import com.jaquadro.minecraft.storagedrawers.ModServices;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
+import net.minecraft.client.resources.model.cuboid.UnbakedCuboidGeometry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.phys.AABB;
@@ -90,10 +91,10 @@ public class DrawerModelGeometry
                                              Identifier locationInd,
                                              Identifier locationIndBase,
                                              BlockDrawers... blocks) {
-        List<BlockElement> slotGeo = getElements(getBlockModel(locationIcon));
-        List<BlockElement> countGeo = getElements(getBlockModel(locationCount));
-        List<BlockElement> indicatorGeo = getElements(getBlockModel(locationInd));
-        List<BlockElement> indicatorBaseGeo = getElements(getBlockModel(locationIndBase));
+        List<CuboidModelElement> slotGeo = getElements(getBlockModel(locationIcon), locationIcon);
+        List<CuboidModelElement> countGeo = getElements(getBlockModel(locationCount), locationCount);
+        List<CuboidModelElement> indicatorGeo = getElements(getBlockModel(locationInd), locationInd);
+        List<CuboidModelElement> indicatorBaseGeo = getElements(getBlockModel(locationIndBase), locationIndBase);
 
         for (BlockDrawers block : blocks) {
             if (block == null)
@@ -106,13 +107,21 @@ public class DrawerModelGeometry
         }
     }
 
-    private static void populateGeometryData (BlockDrawers block, List<BlockElement> info, BlockDrawers.GeometryType type) {
+    private static void populateGeometryData (BlockDrawers block, List<CuboidModelElement> info, BlockDrawers.GeometryType type) {
         if (block == null || info == null)
             return;
 
         int drawerCount = block.getDrawerCount();
-        if (drawerCount > info.size())
+        if (drawerCount > info.size()) {
+            // Leaving the geometry at its AABB(0,0,0,0,0,0) default renders every item
+            // icon, count and fill bar at zero size — visible as "the drawer face is
+            // blank", with nothing in the log to explain it. Say so.
+            ModServices.log.error(
+                "{} geometry for {} has {} element(s) but the block has {} drawer(s); "
+                    + "those slots will render at zero size",
+                type, block, info.size(), drawerCount);
             return;
+        }
 
         for (int i = 0; i < drawerCount; i++) {
             Vector3fc from = info.get(i).from();
@@ -129,27 +138,31 @@ public class DrawerModelGeometry
         }
     }
 
-    private static BlockModel getBlockModel (Identifier location) {
+    private static CuboidModel getBlockModel (Identifier location) {
         Resource iresource = null;
         Reader reader = null;
         try {
             iresource = Minecraft.getInstance().getResourceManager().getResourceOrThrow(location);
             reader = new InputStreamReader(iresource.open(), StandardCharsets.UTF_8);
-            return BlockModel.fromStream(reader);
+            return CuboidModel.fromStream(reader);
         } catch (IOException e) {
+            ModServices.log.error("Could not read drawer geometry model {}", location, e);
             return null;
         } finally {
             IOUtils.closeQuietly(reader);
         }
     }
 
-    private static List<BlockElement> getElements (BlockModel model) {
+    private static List<CuboidModelElement> getElements (CuboidModel model, Identifier location) {
         if (model == null)
             return new ArrayList<>();
 
-        if (model.geometry() instanceof SimpleUnbakedGeometry geo)
+        if (model.geometry() instanceof UnbakedCuboidGeometry geo)
             return geo.elements();
-        else
-            return new ArrayList<>();
+
+        ModServices.log.error("Drawer geometry model {} parsed but carries {} rather than "
+                + "cuboid elements; its slots will render at zero size",
+            location, model.geometry().getClass().getSimpleName());
+        return new ArrayList<>();
     }
 }
