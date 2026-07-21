@@ -1,6 +1,6 @@
 package com.jaquadro.minecraft.storagedrawers.client.model.decorator;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 

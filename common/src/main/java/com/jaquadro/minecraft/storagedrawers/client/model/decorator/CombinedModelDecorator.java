@@ -1,8 +1,8 @@
 package com.jaquadro.minecraft.storagedrawers.client.model.decorator;
 
 import com.jaquadro.minecraft.storagedrawers.client.model.context.ModelContext;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 

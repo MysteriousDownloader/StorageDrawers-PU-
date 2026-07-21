@@ -1,7 +1,7 @@
 package com.jaquadro.minecraft.storagedrawers.client.model;
 
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;

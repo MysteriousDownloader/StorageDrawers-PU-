@@ -12,11 +12,11 @@ import com.jaquadro.minecraft.storagedrawers.core.ModBlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -38,7 +38,7 @@ public class ModelLoadPlugin implements ModelLoadingPlugin
             BlockStateModel original = parent.bake(state, modelBaker);
 
             Block block = state.getBlock();
-            ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
             DrawerModelStore.tryAddModel(state, original);
             if (!DrawerModelStore.INSTANCE.isTargetedModel(state))
                 return original;
@@ -105,7 +105,7 @@ public class ModelLoadPlugin implements ModelLoadingPlugin
                 return original;
 
             Block block = context.state().getBlock();
-            ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
             if (!blockId.getNamespace().equals(ModConstants.MOD_ID))
                 return original;
 
