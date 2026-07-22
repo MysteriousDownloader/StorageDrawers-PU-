@@ -5,7 +5,7 @@
     "version": "${mod_version}",
     "environment": "*",
     "icon": "icon.png",
-    "authors": ["${mod_authors}", "${mod_contributor}"],
+    "authors": ["${mod_authors}", "${mod_maintainer}"],
     "contributors": [
         {
             "name": "${mod_contributor}",

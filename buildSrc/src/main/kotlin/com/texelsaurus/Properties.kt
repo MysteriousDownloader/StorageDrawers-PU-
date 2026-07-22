@@ -6,8 +6,10 @@ object Properties {
     const val filename = "StorageDrawers"
     const val author = "Texelsaur"
 
-    // Port maintainer, shown alongside the original author in the mod list byline and under
-    // Contributors in the credits panel.
+    // Port maintainer. The GitHub handle goes in `authors`, so it appears alongside the
+    // original author in the mod list byline; the in-game name is listed separately under
+    // Contributors and carries the profile link.
+    const val maintainer = "chaevsfe"
     const val contributor = "BumblePie"
     const val contributorUrl = "https://github.com/chaevsfe"
 

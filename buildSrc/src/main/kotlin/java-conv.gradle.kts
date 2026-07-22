@@ -112,6 +112,7 @@ tasks {
             "mod_license" to Properties.license,
             "mod_version" to Versions.mod,
             "mod_authors" to Properties.author,
+            "mod_maintainer" to Properties.maintainer,
             "mod_contributor" to Properties.contributor,
             "mod_contributor_url" to Properties.contributorUrl,
             "mod_sources_url" to Properties.sourcesUrl,
