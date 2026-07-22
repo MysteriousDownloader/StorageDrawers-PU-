@@ -8,27 +8,51 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ConfigItemList
 {
     private final List<String> listedNamespaces = new ArrayList<>();
     private final List<Item> listedItems = new ArrayList<>();
-    private List<String> pendingRules = new ArrayList<>();
+    // Every rule ever registered, kept for the lifetime of the game. The listed items are
+    // rebuilt from scratch each time initialize() runs, so the rules have to outlive them.
+    private final List<String> knownRules = new ArrayList<>();
+    // Non-null only while initialize() is running. innerInitialize() applies the config rules
+    // and the replay loop would then apply the same rules a second time; this makes each rule
+    // take effect once per rebuild instead of logging and resolving twice.
+    private Set<String> appliedThisPass;
     private boolean initialized;
 
     public ConfigItemList () { }
 
+    /**
+     * Builds the listed items from config, and rebuilds them on every later call.
+     *
+     * This cannot run at mod init on 26.2. Resolving a rule to an item ends in
+     * {@code new ItemStack(item)}, and the ItemStack constructor reads the item's data
+     * components eagerly — components are bound during datapack load, so any earlier call
+     * throws {@code NullPointerException: Components not bound yet}. The caller drives this
+     * from a datapack-load hook, which also fires again on every reload; hence the rebuild
+     * rather than a one-shot guard.
+     */
     public void initialize () {
+        listedNamespaces.clear();
+        listedItems.clear();
         initialized = true;
+        appliedThisPass = new HashSet<>();
 
-        innerInitialize();
+        try {
+            innerInitialize();
 
-        for (String rule : pendingRules) {
-            register(rule);
+            for (String rule : List.copyOf(knownRules)) {
+                register(rule);
+            }
         }
-
-        pendingRules = null;
+        finally {
+            appliedThisPass = null;
+        }
     }
 
     protected void innerInitialize () { }
@@ -84,10 +108,14 @@ public class ConfigItemList
     }
 
     public boolean register (String entry) {
-        if (!initialized) {
-            pendingRules.add(entry);
+        if (!knownRules.contains(entry))
+            knownRules.add(entry);
+
+        if (!initialized)
             return true;
-        }
+
+        if (appliedThisPass != null && !appliedThisPass.add(entry))
+            return true;
 
         String[] parts = entry.split("\\s*:\\s*");
         if (parts.length == 1)

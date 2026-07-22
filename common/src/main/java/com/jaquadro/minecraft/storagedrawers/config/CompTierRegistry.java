@@ -10,7 +10,9 @@ import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CompTierRegistry
 {
@@ -31,14 +33,41 @@ public class CompTierRegistry
     }
 
     private final List<Record> records = new ArrayList<>();
-    private List<String> pendingRules = new ArrayList<>();
+    // Every rule ever registered, kept for the lifetime of the game. The records are rebuilt
+    // from scratch each time initialize() runs, so the rules have to outlive them.
+    private final List<String> knownRules = new ArrayList<>();
+    // Non-null only while initialize() is running. The config onLoad callback applies the
+    // config rules and the replay loop would then apply the same rules a second time; this
+    // makes each rule take effect once per rebuild instead of resolving and logging twice.
+    private Set<String> appliedThisPass;
     private boolean initialized;
 
     public CompTierRegistry () { }
 
+    /**
+     * Builds the compacting rules, and rebuilds them on every later call.
+     *
+     * This cannot run at mod init on 26.2. Every rule is a pair of ItemStacks, and the
+     * ItemStack constructor reads the item's data components eagerly — components are bound
+     * during datapack load, so any earlier call throws
+     * {@code NullPointerException: Components not bound yet}. The caller drives this from a
+     * datapack-load hook, which also fires again on every reload; hence the rebuild rather
+     * than a one-shot guard.
+     */
     public void initialize () {
+        records.clear();
         initialized = true;
+        appliedThisPass = new HashSet<>();
 
+        try {
+            buildRules();
+        }
+        finally {
+            appliedThisPass = null;
+        }
+    }
+
+    private void buildRules () {
         if (ModCommonConfig.INSTANCE.DRAWERS.compacting.enableExtraCompactingRules.get()) {
             register(new ItemStack(Blocks.CLAY), new ItemStack(Items.CLAY_BALL), 4);
             register(new ItemStack(Blocks.SNOW_BLOCK), new ItemStack(Items.SNOWBALL), 4);
@@ -58,11 +87,9 @@ public class CompTierRegistry
 
         ModCommonConfig.INSTANCE.onLoad(() -> ModCommonConfig.INSTANCE.DRAWERS.compacting.compRules.get().forEach(this::register));
 
-        for (String rule : pendingRules) {
+        for (String rule : List.copyOf(knownRules)) {
             register(rule);
         }
-
-        pendingRules = null;
     }
 
     public boolean register (@NotNull ItemStack upper, @NotNull ItemStack lower, int convRate) {
@@ -108,10 +135,14 @@ public class CompTierRegistry
     }
 
     public boolean register (String rule) {
-        if (!initialized) {
-            pendingRules.add(rule);
+        if (!knownRules.contains(rule))
+            knownRules.add(rule);
+
+        if (!initialized)
             return true;
-        }
+
+        if (appliedThisPass != null && !appliedThisPass.add(rule))
+            return true;
 
         String[] parts = rule.split("\\s*,\\s*");
         if (parts.length != 3)

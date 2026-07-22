@@ -8,6 +8,7 @@ import com.jaquadro.minecraft.storagedrawers.integration.LocalIntegrationRegistr
 import com.texelsaurus.minecraft.chameleon.api.ChameleonInit;
 import com.texelsaurus.minecraft.chameleon.service.ChameleonConfig;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 public class StorageDrawers implements ModInitializer
@@ -39,9 +40,20 @@ public class StorageDrawers implements ModInitializer
                 PlayerEventListener.onPlayerTick(player);
         });
 
-        CompTierRegistry.INSTANCE.initialize();
-        StorageBlacklist.INSTANCE.initialize();
-        MaterialBlacklist.INSTANCE.initialize();
+        // These three resolve config entries into ItemStacks, which cannot happen here. On
+        // 26.2 an item's data components are data-driven and bound during datapack load, and
+        // the ItemStack constructor reads them eagerly -- building one at mod init throws
+        // "Components not bound yet". TAGS_LOADED fires at the tail of
+        // ReloadableServerResources.updateComponentsAndStaticRegistryTags, which is exactly
+        // the point components become available, and again on every reload and client login.
+        // The three registries rebuild themselves from scratch on each call.
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+            CompTierRegistry.INSTANCE.initialize();
+            StorageBlacklist.INSTANCE.initialize();
+            MaterialBlacklist.INSTANCE.initialize();
+        });
+
+        // Stays here: this one only builds TagKeys and parses strings, never an ItemStack.
         ConversionRegistry.INSTANCE.initialize();
 
         LocalIntegrationRegistry.initialize();
