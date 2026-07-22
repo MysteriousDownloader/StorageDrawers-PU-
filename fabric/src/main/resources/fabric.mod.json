@@ -5,12 +5,20 @@
     "version": "${mod_version}",
     "environment": "*",
     "icon": "icon.png",
-    "authors": ["${mod_authors}"],
+    "authors": ["${mod_authors}", "${mod_contributor}"],
+    "contributors": [
+        {
+            "name": "${mod_contributor}",
+            "contact": {
+                "homepage": "${mod_contributor_url}"
+            }
+        }
+    ],
     "license": "${mod_license}",
     "contact": {
         "homepage": "https://www.curseforge.com/minecraft/mc-mods/storage-drawers",
-        "sources": "https://github.com/jaquadro/StorageDrawers",
-        "issues": "https://github.com/jaquadro/StorageDrawers/issues"
+        "sources": "${mod_sources_url}",
+        "issues": "${mod_issues_url}"
     },
     "description": "${mod_description}",
     "accessWidener": "storagedrawers.fabric.accesswidener",
