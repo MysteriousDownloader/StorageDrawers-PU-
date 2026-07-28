@@ -7,13 +7,14 @@ object Properties {
     const val author = "Texelsaur"
 
     // Port maintainer. The GitHub handle goes in `authors`, so it appears alongside the
-    // original author in the mod list byline; the in-game name is listed separately under
-    // Contributors and carries the profile link.
+    // original author in the mod list byline. There is no Contributors block: one person
+    // listed under two names, both linking to the same profile, reads as two people.
     const val maintainer = "chaevsfe"
-    const val contributor = "BumblePie"
-    const val contributorUrl = "https://github.com/chaevsfe"
 
-    // This fork. `homepage` stays pointed at the original CurseForge project.
+    // This fork. `homepage` is the mod list's Website button, so it points at this fork's
+    // download page -- it used to be the original's CurseForge project, which sent anyone
+    // clicking it to a different mod.
+    const val homepageUrl = "https://modrinth.com/mod/storagedrawers-unofficial-fabric-port"
     const val sourcesUrl = "https://github.com/chaevsfe/StorageDrawers"
     const val issuesUrl = "https://github.com/chaevsfe/StorageDrawers/issues"
     const val modid = "storagedrawers"

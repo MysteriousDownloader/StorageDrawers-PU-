@@ -6,17 +6,9 @@
     "environment": "*",
     "icon": "icon.png",
     "authors": ["${mod_authors}", "${mod_maintainer}"],
-    "contributors": [
-        {
-            "name": "${mod_contributor}",
-            "contact": {
-                "homepage": "${mod_contributor_url}"
-            }
-        }
-    ],
     "license": "${mod_license}",
     "contact": {
-        "homepage": "https://www.curseforge.com/minecraft/mc-mods/storage-drawers",
+        "homepage": "${mod_homepage_url}",
         "sources": "${mod_sources_url}",
         "issues": "${mod_issues_url}"
     },
