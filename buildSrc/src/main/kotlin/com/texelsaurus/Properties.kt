@@ -17,10 +17,16 @@ object Properties {
     const val sourcesUrl = "https://github.com/chaevsfe/StorageDrawers"
     const val issuesUrl = "https://github.com/chaevsfe/StorageDrawers/issues"
     const val modid = "storagedrawers"
-    const val curseProjectId = "223852"
-    const val modrinthProjectId = "guitPqEi"
+
+    // Both of these were the ORIGINAL project's ids. Publishing with them would attempt to
+    // upload this fork to Texelsaur's pages, so they are placeholders until this fork has its
+    // own. Replace modrinthProjectId with the id from the fork's Modrinth project settings.
+    // Must stay numeric: CurseForgeGradle parses it at configuration time, so a word here
+    // breaks every build, not just publishing. 0 is a deliberate no-such-project.
+    const val curseProjectId = "0"
+    const val modrinthProjectId = "REPLACE_WITH_FORK_MODRINTH_PROJECT_ID"
     const val description = "Interactive compartment storage for your workshops"
     const val license = "MIT"
     const val distRelease = "release"
-    const val distGameVersions = "1.21.10"
+    const val distGameVersions = "26.2"
 }

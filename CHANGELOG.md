@@ -1,4 +1,9 @@
+[19.1.2]
+- Fixed enchanted and NBT-bearing items being lost from drawers when upgrading a world from 1.21.4 or earlier
+
 [19.1.1]
+- Unofficial port to Minecraft 26.2 on Fabric
+- Restored drawer GUI tooltips
 - Restored rendering of fill indicators
 
 [19.1.0]

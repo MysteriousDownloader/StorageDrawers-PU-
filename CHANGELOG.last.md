@@ -1,1 +1,1 @@
-- Restored rendering of fill indicators
+- Fixed enchanted and NBT-bearing items being lost from drawers when upgrading a world from 1.21.4 or earlier. Install before the first load on 26.2 — it cannot recover a world that has already been opened.
