@@ -1,13 +1,18 @@
 StorageDrawers
 ==============
 
-A mod adding compartmental storage for Minecraft Forge
+A mod adding compartmental storage for Minecraft Fabric (unofficial port)
+
+Before updating
+==============
+
+empty modded containers of enchanted and NBT-bearing items into vanilla storage or your inventory. [issue #1](https://github.com/chaevsfe/StorageDrawers/issues/1)
+
 
 For Players
 -----------
 
-StorageDrawers may be downloaded from any of the following sites:
-
+All credit goes to the original author.
 - [Minecraft Forums](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2198533-storage-drawers-v1-10-7-v3-5-0-v4-0-0-updated-nov)
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/storage-drawers)
 - [Github Releases](https://github.com/jaquadro/StorageDrawers/releases)
