@@ -4,6 +4,7 @@ import com.jaquadro.minecraft.storagedrawers.api.framing.FrameMaterial;
 import com.jaquadro.minecraft.storagedrawers.api.framing.IFramedMaterials;
 import com.jaquadro.minecraft.storagedrawers.components.item.FrameData;
 import com.jaquadro.minecraft.storagedrawers.core.ModDataComponents;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -23,10 +24,10 @@ public class MaterialData extends BlockEntityDataShim implements IFramedMaterial
 
     public static final Codec<MaterialData> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(
-            ItemStack.CODEC.fieldOf("frameBase").forGetter(MaterialData::getFrameBase),
-            ItemStack.CODEC.fieldOf("materialSide").forGetter(MaterialData::getSide),
-            ItemStack.CODEC.fieldOf("materialFront").forGetter(MaterialData::getFront),
-            ItemStack.CODEC.fieldOf("materialTrim").forGetter(MaterialData::getTrim)
+            LegacyStackCodec.CODEC.fieldOf("frameBase").forGetter(MaterialData::getFrameBase),
+            LegacyStackCodec.CODEC.fieldOf("materialSide").forGetter(MaterialData::getSide),
+            LegacyStackCodec.CODEC.fieldOf("materialFront").forGetter(MaterialData::getFront),
+            LegacyStackCodec.CODEC.fieldOf("materialTrim").forGetter(MaterialData::getTrim)
         ).apply(instance, MaterialData::new)
     );
 
@@ -157,10 +158,10 @@ public class MaterialData extends BlockEntityDataShim implements IFramedMaterial
 
     @Override
     public void read (ValueInput input) {
-        frameBase = input.read("MatB", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        materialSide = input.read("MatS", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        materialFront = input.read("MatF", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        materialTrim = input.read("MatT", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        frameBase = input.read("MatB", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
+        materialSide = input.read("MatS", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
+        materialFront = input.read("MatF", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
+        materialTrim = input.read("MatT", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
     }
 
     @Override

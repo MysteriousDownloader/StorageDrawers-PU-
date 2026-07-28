@@ -11,6 +11,7 @@ import com.jaquadro.minecraft.storagedrawers.item.ItemDrawers;
 import com.jaquadro.minecraft.storagedrawers.util.CompactingHelper;
 import com.jaquadro.minecraft.storagedrawers.util.ItemStackMatcher;
 import com.jaquadro.minecraft.storagedrawers.util.ItemStackTagMatcher;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -579,7 +580,7 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
             for (var slotTag : itemList) {
                 int slot = slotTag.getIntOr("Slot", 0);
 
-                protoStack[slot] = slotTag.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+                protoStack[slot] = slotTag.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
                 convRate[slot] = slotTag.getIntOr("Conv", 0);
 
                 IDrawerAttributes attrs = getAttributes();

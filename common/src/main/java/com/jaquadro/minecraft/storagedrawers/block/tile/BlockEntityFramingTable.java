@@ -11,6 +11,7 @@ import com.jaquadro.minecraft.storagedrawers.core.ModBlockEntities;
 import com.jaquadro.minecraft.storagedrawers.core.ModContainers;
 import com.jaquadro.minecraft.storagedrawers.core.ModDataComponents;
 import com.jaquadro.minecraft.storagedrawers.inventory.*;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import com.jaquadro.minecraft.storagedrawers.util.WorldUtils;
 import com.texelsaurus.minecraft.chameleon.inventory.ContentMenuProvider;
 import com.texelsaurus.minecraft.chameleon.inventory.content.PositionContent;
@@ -84,8 +85,8 @@ public class BlockEntityFramingTable extends BaseBlockEntity implements Nameable
     protected void readFixed (ValueInput input) {
         super.readFixed(input);
 
-        inputStack = input.read("Input", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        resultStack = input.read("Result", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        inputStack = input.read("Input", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
+        resultStack = input.read("Result", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
     }
 
     @Override

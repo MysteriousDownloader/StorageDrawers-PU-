@@ -3,6 +3,7 @@ package com.jaquadro.minecraft.storagedrawers.block.tile.tiledata;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.config.ModCommonConfig;
 import com.jaquadro.minecraft.storagedrawers.inventory.ItemStackHelper;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -147,7 +148,7 @@ public class DetachedDrawerData implements IDrawer
         storageMult = input.getIntOr("StorageMult", ModCommonConfig.INSTANCE.DRAWERS.baseStackStorage.get() * 8);
 
         setIsHeavy(input.getBooleanOr("Heavy", false));
-        setStoredItemRaw(input.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY));
+        setStoredItemRaw(input.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY));
         setStoredItemCountRaw(input.getIntOr("Count", 0));
     }
 }

@@ -10,6 +10,7 @@ import com.jaquadro.minecraft.storagedrawers.item.ItemDetachedDrawer;
 import com.jaquadro.minecraft.storagedrawers.item.ItemDrawers;
 import com.jaquadro.minecraft.storagedrawers.util.ItemStackMatcher;
 import com.jaquadro.minecraft.storagedrawers.util.ItemStackTagMatcher;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
@@ -414,7 +415,7 @@ public abstract class StandardDrawerGroup extends BlockEntityDataShim implements
         }
 
         public void deserializeNBT (ValueInput input) {
-            setStoredItemRaw(input.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY));
+            setStoredItemRaw(input.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY));
             setStoredItemCountRaw(input.getIntOr("Count", 0));
 
             missing = input.getBooleanOr("Missing", false);

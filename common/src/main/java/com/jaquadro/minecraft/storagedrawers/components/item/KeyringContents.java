@@ -2,6 +2,7 @@ package com.jaquadro.minecraft.storagedrawers.components.item;
 
 import com.google.common.collect.Lists;
 import com.jaquadro.minecraft.storagedrawers.item.ItemKey;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 public class KeyringContents implements TooltipComponent
 {
     public static final KeyringContents EMPTY = new KeyringContents(List.of());
-    public static final Codec<KeyringContents> CODEC = ItemStack.CODEC
+    public static final Codec<KeyringContents> CODEC = LegacyStackCodec.CODEC
         .listOf().xmap(KeyringContents::new, kc -> kc.items);
     public static final StreamCodec<RegistryFriendlyByteBuf, KeyringContents> STREAM_CODEC = ItemStack.STREAM_CODEC
         .apply(ByteBufCodecs.list())

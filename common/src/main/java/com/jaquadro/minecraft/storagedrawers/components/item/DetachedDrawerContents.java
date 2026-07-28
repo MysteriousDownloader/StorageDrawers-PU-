@@ -1,5 +1,6 @@
 package com.jaquadro.minecraft.storagedrawers.components.item;
 
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -12,7 +13,7 @@ public class DetachedDrawerContents implements TooltipComponent
     public static final DetachedDrawerContents EMPTY = new DetachedDrawerContents(ItemStack.EMPTY, 0, false);
     public static final Codec<DetachedDrawerContents> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(
-            ItemStack.CODEC.optionalFieldOf("item", ItemStack.EMPTY).forGetter(DetachedDrawerContents::getItemPrototype),
+            LegacyStackCodec.CODEC.optionalFieldOf("item", ItemStack.EMPTY).forGetter(DetachedDrawerContents::getItemPrototype),
             Codec.INT.optionalFieldOf("itemCount", 0).forGetter(DetachedDrawerContents::getItemCount),
             Codec.INT.fieldOf("stackLimit").forGetter(DetachedDrawerContents::getStackLimit),
             Codec.BOOL.fieldOf("heavy").forGetter(DetachedDrawerContents::isHeavy)

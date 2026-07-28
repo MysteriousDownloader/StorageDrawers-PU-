@@ -1,6 +1,7 @@
 package com.jaquadro.minecraft.storagedrawers.components.item;
 
 import com.jaquadro.minecraft.storagedrawers.block.tile.tiledata.MaterialData;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,10 +14,10 @@ public record FrameData (ItemStack base, ItemStack side, ItemStack trim, ItemSta
 
     public static final Codec<FrameData> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(
-            ItemStack.OPTIONAL_CODEC.fieldOf("base").forGetter(FrameData::base),
-            ItemStack.OPTIONAL_CODEC.fieldOf("side").forGetter(FrameData::side),
-            ItemStack.OPTIONAL_CODEC.fieldOf("trim").forGetter(FrameData::trim),
-            ItemStack.OPTIONAL_CODEC.fieldOf("front").forGetter(FrameData::front)
+            LegacyStackCodec.OPTIONAL_CODEC.fieldOf("base").forGetter(FrameData::base),
+            LegacyStackCodec.OPTIONAL_CODEC.fieldOf("side").forGetter(FrameData::side),
+            LegacyStackCodec.OPTIONAL_CODEC.fieldOf("trim").forGetter(FrameData::trim),
+            LegacyStackCodec.OPTIONAL_CODEC.fieldOf("front").forGetter(FrameData::front)
         ).apply(instance, FrameData::new)
     );
 
