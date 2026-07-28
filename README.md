@@ -3,10 +3,12 @@ StorageDrawers
 
 A mod adding compartmental storage for Minecraft Fabric (unofficial port)
 
+- Fabric 26.2
+
 Before updating
 ==============
 
-empty modded containers of enchanted and NBT-bearing items into vanilla storage or your inventory. [issue #1](https://github.com/chaevsfe/StorageDrawers/issues/1)
+Enchanted and NBT-bearing may be deleted or reverted. Empty modded containers of items into vanilla storage or your inventory or test before updating. [issue #1](https://github.com/chaevsfe/StorageDrawers/issues/1)
 
 
 For Players
