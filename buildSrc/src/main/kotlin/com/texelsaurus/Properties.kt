@@ -24,7 +24,7 @@ object Properties {
     // Must stay numeric: CurseForgeGradle parses it at configuration time, so a word here
     // breaks every build, not just publishing. 0 is a deliberate no-such-project.
     const val curseProjectId = "0"
-    const val modrinthProjectId = "REPLACE_WITH_FORK_MODRINTH_PROJECT_ID"
+    const val modrinthProjectId = "3bqn07Ul"
     const val description = "Interactive compartment storage for your workshops"
     const val license = "MIT"
     const val distRelease = "release"
