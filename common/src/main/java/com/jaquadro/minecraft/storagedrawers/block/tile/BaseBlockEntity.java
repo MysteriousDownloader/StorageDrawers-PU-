@@ -1,6 +1,8 @@
 package com.jaquadro.minecraft.storagedrawers.block.tile;
 
 import com.jaquadro.minecraft.storagedrawers.block.tile.tiledata.BlockEntityDataShim;
+import com.jaquadro.minecraft.storagedrawers.util.LegacyStackCodec;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -55,14 +57,17 @@ public class BaseBlockEntity extends BlockEntity
 
         //failureSnapshot = null;
 
-        //try {
+        // Vanilla's data fixer has no schema for modded block entities, so it upgrades the
+        // chunk around this NBT but never inside it. The version stamped at save time tells
+        // LegacyStackCodec exactly which fixes the item stacks in here still need.
+        LegacyStackCodec.pushSourceDataVersion(input.getIntOr("DataVersion", -1));
+        try {
             readFixed(input);
             readPortable(input);
             onLoadFinished();
-        //}
-        //catch (Throwable t) {
-        //    trapLoadFailure(t, tag);
-        //}
+        } finally {
+            LegacyStackCodec.popSourceDataVersion();
+        }
 
         if (level != null && level.isClientSide() && dataPacketRequiresRenderUpdate())
             markBlockForRenderUpdate();
@@ -98,6 +103,7 @@ public class BaseBlockEntity extends BlockEntity
     protected void saveAdditional (ValueOutput output) {
         super.saveAdditional(output);
 
+        output.putInt("DataVersion", SharedConstants.WORLD_VERSION);
         writeFixed(output);
         writePortable(output);
     }

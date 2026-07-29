@@ -16,6 +16,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -123,6 +124,11 @@ public abstract class StandardDrawerGroup extends BlockEntityDataShim implements
         private ItemStackMatcher matcher;
         private boolean missing;
 
+        // Raw "Item" NBT that no repair could decode. Held so a load failure never destroys
+        // data on the next save: the slot presents as empty, but the bytes round-trip until
+        // either a codec that can read them arrives or a player stores something new here.
+        private CompoundTag unreadableItemTag;
+
         public DrawerData (StandardDrawerGroup group) {
             this.group = group;
             protoStack = ItemStack.EMPTY;
@@ -201,6 +207,7 @@ public abstract class StandardDrawerGroup extends BlockEntityDataShim implements
         }
 
         protected IDrawer setStoredItemRaw (@NotNull ItemStack itemPrototype) {
+            unreadableItemTag = null;
             itemPrototype = ItemStackHelper.getItemPrototype(itemPrototype);
             protoStack = itemPrototype;
             protoStack.setCount(1);
@@ -407,16 +414,35 @@ public abstract class StandardDrawerGroup extends BlockEntityDataShim implements
         public void serializeNBT (ValueOutput output) {
             output.putBoolean("Missing", missing);
 
-            if (protoStack.isEmpty())
+            if (protoStack.isEmpty()) {
+                if (unreadableItemTag != null) {
+                    output.store("Item", CompoundTag.CODEC, unreadableItemTag);
+                    output.putInt("Count", count);
+                }
                 return;
+            }
 
             output.store("Item", ItemStack.CODEC, protoStack);
             output.putInt("Count", count);
         }
 
         public void deserializeNBT (ValueInput input) {
-            setStoredItemRaw(input.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY));
+            CompoundTag rawItem = input.read("Item", CompoundTag.CODEC).orElse(null);
+            // Parse via the codec directly and accept only a FULL success: ValueInput.read
+            // hands back a failed decode's partial value, which silently strips whatever
+            // component failed instead of surfacing the loss.
+            ItemStack stack = rawItem == null ? ItemStack.EMPTY
+                : LegacyStackCodec.CODEC.parse(
+                    input.lookup().createSerializationContext(NbtOps.INSTANCE), rawItem)
+                    .result().orElse(ItemStack.EMPTY);
+
+            setStoredItemRaw(stack);
             setStoredItemCountRaw(input.getIntOr("Count", 0));
+
+            if (rawItem != null && stack.isEmpty()) {
+                unreadableItemTag = rawItem;
+                LegacyStackCodec.reportUnreadable(rawItem);
+            }
 
             missing = input.getBooleanOr("Missing", false);
         }

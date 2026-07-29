@@ -108,6 +108,10 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
         private final ItemStackMatcher[] matchers;
         private int pooledCount;
 
+        // Original {Items, Count} NBT parked here when any tier failed to decode, so a load
+        // failure never destroys data on the next save. See deserializeNBT.
+        private CompoundTag unreadablePayload;
+
         private ItemStack cacheKey;
         private final ItemStack[] cachedProtoStack;
         private final int[] cachedConvRate;
@@ -553,6 +557,7 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
         }
 
         public void serializeNBT (ValueOutput output) {
+            boolean hasContent = false;
             var itemList = output.childrenList("Items");
             for (int i = 0; i < slotCount; i++) {
                 if (protoStack[i].isEmpty())
@@ -562,9 +567,20 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
                 slotTag.store("Item", ItemStack.CODEC, protoStack[i]);
                 slotTag.putByte("Slot", (byte)i);
                 slotTag.putInt("Conv", convRate[i]);
+                hasContent = true;
             }
 
             output.putInt("Count", pooledCount);
+
+            if (unreadablePayload != null) {
+                if (hasContent) {
+                    // The player stored a new item family while the old one was unreadable;
+                    // the drawer has been legitimately reused, so the stash is now dead.
+                    unreadablePayload = null;
+                } else {
+                    output.store("Unreadable", CompoundTag.CODEC, unreadablePayload);
+                }
+            }
         }
 
         public void deserializeNBT (ValueInput input) {
@@ -573,20 +589,59 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
                 matchers[i] = ItemStackMatcher.EMPTY;
                 convRate[i] = 0;
             }
+            unreadablePayload = null;
 
             pooledCount = input.getIntOr("Count", 0);
 
+            boolean anyUnreadable = false;
+            var deserializeOps = input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE);
             var itemList = input.childrenListOrEmpty("Items");
             for (var slotTag : itemList) {
                 int slot = slotTag.getIntOr("Slot", 0);
 
-                protoStack[slot] = slotTag.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY);
+                // Parse via the codec directly and accept only a FULL success: ValueInput.read
+                // hands back a failed decode's partial value, which silently strips whatever
+                // component failed instead of surfacing the loss.
+                CompoundTag rawItem = slotTag.read("Item", CompoundTag.CODEC).orElse(null);
+                ItemStack stack = rawItem == null ? ItemStack.EMPTY
+                    : LegacyStackCodec.CODEC.parse(deserializeOps, rawItem).result().orElse(ItemStack.EMPTY);
+                if (rawItem != null && stack.isEmpty())
+                    anyUnreadable = true;
+
+                protoStack[slot] = stack;
                 convRate[slot] = slotTag.getIntOr("Conv", 0);
 
                 IDrawerAttributes attrs = getAttributes();
                 matchers[slot] = attrs.isDictConvertible()
                     ? new ItemStackTagMatcher(protoStack[slot])
                     : new ItemStackMatcher(protoStack[slot]);
+            }
+
+            // A compacting drawer's slots are tiers of one item family, so a partly readable
+            // group is meaningless. If any tier failed, park the WHOLE original list plus the
+            // pooled count and load empty: the bytes then survive every save, and each load
+            // retries the decode, so the group restores itself the moment a codec that can
+            // read it exists (a future repair, or the item's mod being reinstalled).
+            if (anyUnreadable) {
+                CompoundTag payload = new CompoundTag();
+                input.read("Items", CompoundTag.CODEC.listOf())
+                    .ifPresent(list -> {
+                        ListTag items = new ListTag();
+                        items.addAll(list);
+                        payload.put("Items", items);
+                    });
+                payload.putInt("Count", pooledCount);
+                unreadablePayload = payload;
+                LegacyStackCodec.reportUnreadable(payload);
+
+                for (int i = 0; i < slotCount; i++) {
+                    protoStack[i] = ItemStack.EMPTY;
+                    matchers[i] = ItemStackMatcher.EMPTY;
+                    convRate[i] = 0;
+                }
+                pooledCount = 0;
+            } else {
+                tryRecoverUnreadable(input);
             }
 
             // TODO: We should only need to normalize if we had blank items with a conv rate, but this fixes blocks that were saved broken
@@ -603,6 +658,63 @@ public class FractionalDrawerGroup extends BlockEntityDataShim implements IDrawe
                 if (!cacheMatch)
                     cacheKey = ItemStack.EMPTY;
             }
+        }
+
+        // A payload parked by an earlier failed load rides along under "Unreadable". Retry it
+        // on every load; the first time every entry decodes, the group repopulates and the
+        // stash is dropped. If live Items were also loaded, the drawer was reused -- the live
+        // contents win and the stash is dropped as dead.
+        private void tryRecoverUnreadable (ValueInput input) {
+            CompoundTag payload = input.read("Unreadable", CompoundTag.CODEC).orElse(null);
+            if (payload == null)
+                return;
+
+            boolean liveContent = false;
+            for (int i = 0; i < slotCount; i++)
+                liveContent |= !protoStack[i].isEmpty();
+            if (liveContent) {
+                group.log("Dropping parked unreadable contents: the drawer has been reused");
+                return;
+            }
+
+            var ops = input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE);
+            ListTag items = payload.getListOrEmpty("Items");
+
+            ItemStack[] recovered = new ItemStack[slotCount];
+            int[] recoveredConv = new int[slotCount];
+            java.util.Arrays.fill(recovered, ItemStack.EMPTY);
+
+            for (Tag entry : items) {
+                if (!(entry instanceof CompoundTag slotTag)) {
+                    unreadablePayload = payload;
+                    return;
+                }
+                int slot = slotTag.getIntOr("Slot", 0);
+                if (slot < 0 || slot >= slotCount) {
+                    unreadablePayload = payload;
+                    return;
+                }
+                Tag itemTag = slotTag.get("Item");
+                ItemStack stack = itemTag == null ? ItemStack.EMPTY
+                    : LegacyStackCodec.CODEC.parse(ops, itemTag).result().orElse(ItemStack.EMPTY);
+                if (stack.isEmpty()) {
+                    unreadablePayload = payload;   // still unreadable; keep carrying it
+                    return;
+                }
+                recovered[slot] = stack;
+                recoveredConv[slot] = slotTag.getIntOr("Conv", 0);
+            }
+
+            IDrawerAttributes attrs = getAttributes();
+            for (int i = 0; i < slotCount; i++) {
+                protoStack[i] = recovered[i];
+                convRate[i] = recoveredConv[i];
+                matchers[i] = attrs.isDictConvertible()
+                    ? new ItemStackTagMatcher(protoStack[i])
+                    : new ItemStackMatcher(protoStack[i]);
+            }
+            pooledCount = payload.getIntOr("Count", 0);
+            group.log("Recovered previously unreadable compacting drawer contents");
         }
 
         public void syncAttributes () {

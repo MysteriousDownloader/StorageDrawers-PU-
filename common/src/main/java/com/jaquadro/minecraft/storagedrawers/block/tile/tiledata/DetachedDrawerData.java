@@ -148,7 +148,14 @@ public class DetachedDrawerData implements IDrawer
         storageMult = input.getIntOr("StorageMult", ModCommonConfig.INSTANCE.DRAWERS.baseStackStorage.get() * 8);
 
         setIsHeavy(input.getBooleanOr("Heavy", false));
-        setStoredItemRaw(input.read("Item", LegacyStackCodec.CODEC).orElse(ItemStack.EMPTY));
+        // Parse via the codec directly and accept only a FULL success -- ValueInput.read
+        // hands back a failed decode's partial value, silently stripping the failed component.
+        ItemStack stack = input.read("Item", net.minecraft.nbt.CompoundTag.CODEC)
+            .map(raw -> LegacyStackCodec.CODEC.parse(
+                input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), raw)
+                .result().orElse(ItemStack.EMPTY))
+            .orElse(ItemStack.EMPTY);
+        setStoredItemRaw(stack);
         setStoredItemCountRaw(input.getIntOr("Count", 0));
     }
 }
