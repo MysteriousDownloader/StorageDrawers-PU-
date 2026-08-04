@@ -9,7 +9,7 @@ Versions
 | Minecraft | Branch | Latest release |
 |---|---|---|
 | 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | [v26.2-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.2-19.1.3) |
-| 26.1 | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | [v26.1-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.1-19.1.3) |
+| 26.1.x | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | [v26.1-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.1-19.1.3) |
 
 Also on [Modrinth](https://modrinth.com/mod/storagedrawers-unofficial-fabric-port).
 
@@ -18,10 +18,16 @@ Before updating
 
 Enchanted and NBT-bearing may be deleted or reverted. Create a backup, if any problems: Empty modded containers of items into vanilla storage or your inventory before updating and report [issues](https://github.com/chaevsfe/StorageDrawers/issues).
 
+Verified from **1.18.2**: ﻿Enchantments, ﻿﻿custom names, attribute modifiers, model data, consumable properties, locks, jukebox data, tooltip visibility flags, old NBT-format items﻿. 
+
+Modded items passed through unchanged: Most mods migrate their own data fine, but if a mod changes it's data format between versions without a migration items may be lost.
+
+Worlds only move forward: a world opened in 26.2 cannot go back to 26.1
+
 For Players
 -----------
 
-All credit goes to the original author.
+All credit goes to the original author:
 - [Minecraft Forums](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2198533-storage-drawers-v1-10-7-v3-5-0-v4-0-0-updated-nov)
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/storage-drawers)
 - [Github Releases](https://github.com/jaquadro/StorageDrawers/releases)
