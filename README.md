@@ -6,8 +6,6 @@ A mod adding compartmental storage for Minecraft Fabric (unofficial port)
 Versions
 ========
 
-Each Minecraft version lives on its own branch. Releases are tagged `v<minecraft>-<mod version>`.
-
 | Minecraft | Branch | Latest release |
 |---|---|---|
 | 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | [v26.2-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.2-19.1.3) |
@@ -18,7 +16,7 @@ Also on [Modrinth](https://modrinth.com/mod/storagedrawers-unofficial-fabric-por
 Before updating
 ===============
 
-Enchanted and NBT-bearing may be deleted or reverted. Create a backup, if any problems: Empty modded containers of items into vanilla storage or your inventory before updating and report issues (https://github.com/chaevsfe/StorageDrawers/issues).
+Enchanted and NBT-bearing may be deleted or reverted. Create a backup, if any problems: Empty modded containers of items into vanilla storage or your inventory before updating and report [issues](https://github.com/chaevsfe/StorageDrawers/issues).
 
 For Players
 -----------
