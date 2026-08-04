@@ -16,13 +16,13 @@ Also on [Modrinth](https://modrinth.com/mod/storagedrawers-unofficial-fabric-por
 Before updating
 ===============
 
-Enchanted and NBT-bearing may be deleted or reverted. Create a backup, if any problems: Empty modded containers of items into vanilla storage or your inventory before updating and report [issues](https://github.com/chaevsfe/StorageDrawers/issues).
+Enchanted and NBT-bearing may be deleted or reverted. Create a backup, if any problems: Empty modded containers of items into vanilla storage or your inventory before updating and report any [issues](https://github.com/chaevsfe/StorageDrawers/issues).
 
 Verified from **1.18.2**: ﻿Enchantments, ﻿﻿custom names, attribute modifiers, model data, consumable properties, locks, jukebox data, tooltip visibility flags, old NBT-format items﻿. 
 
 Modded items passed through unchanged: Most mods migrate their own data fine, but if a mod changes it's data format between versions without a migration items may be lost.
 
-Worlds only move forward: a world opened in 26.2 cannot go back to 26.1
+Worlds only move forward: a world opened in 26.2 may not go back to 26.1
 
 For Players
 -----------
