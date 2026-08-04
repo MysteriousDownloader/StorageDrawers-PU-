@@ -1,3 +1,0 @@
-- Stored items now migrate through vanilla's own data fixer, covering worlds from any version back to 1.18.2 (enchantments, attributes, custom model data, food, names, and more)
-- Items that cannot be read at all (for example from a removed mod) are preserved instead of deleted, and reappear once something can read them again
-- Added a mod icon
