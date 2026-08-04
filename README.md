@@ -8,8 +8,8 @@ Versions
 
 | Minecraft | Branch | Latest release |
 |---|---|---|
-| 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | [v26.2-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.2-19.1.3) |
-| 26.1.x | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | [v26.1-19.1.3](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.1-19.1.3) |
+| 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | [v26.2-19.1.4](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.2-19.1.4) |
+| 26.1.x | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | [v26.1-19.1.4](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.1-19.1.4) |
 
 Also on [Modrinth](https://modrinth.com/mod/storagedrawers-unofficial-fabric-port).
 
