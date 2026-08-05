@@ -1,15 +1,15 @@
 StorageDrawers
 ==============
 
-A mod adding compartmental storage for Minecraft Fabric (unofficial port)
+A mod adding compartmental storage for Minecraft Fabric/NeoForge (unofficial port)
 
 Versions
 ========
 
-| Minecraft | Branch | Latest release |
-|---|---|---|
-| 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | [v26.2-19.1.4](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.2-19.1.4) |
-| 26.1.x | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | [v26.1-19.1.4](https://github.com/chaevsfe/StorageDrawers/releases/tag/v26.1-19.1.4) |
+| Minecraft | Branch | Loaders | Latest release |
+|---|---|---|---|
+| 26.2 | [port/26.2](https://github.com/chaevsfe/StorageDrawers/tree/port/26.2) | Fabric, NeoForge | [v19.1.5](https://github.com/chaevsfe/StorageDrawers/releases/tag/v19.1.5) |
+| 26.1.x | [port/26.1](https://github.com/chaevsfe/StorageDrawers/tree/port/26.1) | Fabric, NeoForge | [v19.1.5](https://github.com/chaevsfe/StorageDrawers/releases/tag/v19.1.5) |
 
 Also on [Modrinth](https://modrinth.com/mod/storagedrawers-unofficial-fabric-port).
 
@@ -45,7 +45,7 @@ StorageDrawers is built using `gradle`. These commands should be enough to get y
 git clone https://github.com/chaevsfe/StorageDrawers
 cd StorageDrawers
 git checkout port/26.1   # or port/26.2 -- pick the branch for your Minecraft version
-./gradlew :fabric:build
+./gradlew :fabric:build     # or :neoforge:build
 ```
 
 Reporting Bugs
