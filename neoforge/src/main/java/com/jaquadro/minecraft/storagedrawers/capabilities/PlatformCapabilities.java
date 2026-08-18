@@ -25,19 +25,16 @@ public class PlatformCapabilities {
             cast(Capabilities.ITEM_HANDLER).register(event, entity, (e, c) -> new DrawerItemHandler(e));
 
             cast(ITEM_HANDLER).register(event, entity, (e, c) -> e.isBoundToActiveController() ? null : DrawerGroupResourceHandler.of(e));
-            event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, entity.get(), (e, c) -> e.isBoundToActiveController() ? null : new PlatformDrawerItemHandler(e));
         });
 
         cast(Capabilities.DRAWER_GROUP).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> e.getItemRepository());
         cast(Capabilities.ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> new DrawerItemHandler(e));
         cast(ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> DrawerGroupResourceHandler.of(e));
-        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, ModBlockEntities.CONTROLLER.get(), (e, c) -> new PlatformDrawerItemHandler(e));
 
         cast(Capabilities.DRAWER_GROUP).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> e.getItemRepository());
         cast(Capabilities.ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> new DrawerItemHandler(e));
         cast(ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> DrawerGroupResourceHandler.of(e));
-        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> new PlatformDrawerItemHandler(e));
     }
 }
