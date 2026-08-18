@@ -97,6 +97,25 @@ public class DrawerStackStorage extends SingleStackStorage
         if (!storage.getDrawer(slot).canItemBeStored(insertedVariant.toStack()))
             return 0;
 
+        // ponytail: empty unlocked slots defer to existing matching drawers with room,
+        // so external iterators (Tom's Storage etc.) route to the correct drawer first.
+        IDrawer thisDrawer = storage.getDrawer(slot);
+        if (thisDrawer.isEmpty()) {
+            var attrs = thisDrawer.getAttributes();
+            boolean isLockedEmpty = attrs != null && attrs.isItemLocked(com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute.LOCK_EMPTY);
+            if (!isLockedEmpty) {
+                IDrawerGroup g = storage.group;
+                for (int i = 0; i < g.getDrawerCount(); i++) {
+                    if (i == slot) continue;
+                    IDrawer other = g.getDrawer(i);
+                    if (other.isEmpty() || !other.isEnabled()) continue;
+                    if (other.getRemainingCapacity() <= 0) continue;
+                    if (!other.canItemBeStored(insertedVariant.toStack())) continue;
+                    return 0;
+                }
+            }
+        }
+
         long inserted = super.insert(insertedVariant, maxAmount, transaction);
 
         if (inserted < maxAmount && insertedVariant.matches(getStack())) {

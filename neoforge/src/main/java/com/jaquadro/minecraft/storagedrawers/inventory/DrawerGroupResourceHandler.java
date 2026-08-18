@@ -225,6 +225,22 @@ public class DrawerGroupResourceHandler implements ResourceHandler<ItemResource>
                 return 0;
             if (!group.getDrawer(slot).canItemBeStored(resource.toStack()))
                 return 0;
+            // ponytail: empty unlocked slots defer to existing matching drawers with room
+            IDrawer thisDrawer = group.getDrawer(slot);
+            if (thisDrawer.isEmpty()) {
+                var attrs = thisDrawer.getAttributes();
+                boolean isLockedEmpty = attrs != null && attrs.isItemLocked(com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute.LOCK_EMPTY);
+                if (!isLockedEmpty) {
+                    for (int i = 0; i < group.getDrawerCount(); i++) {
+                        if (i == slot) continue;
+                        IDrawer other = group.getDrawer(i);
+                        if (other.isEmpty() || !other.isEnabled()) continue;
+                        if (other.getRemainingCapacity() <= 0) continue;
+                        if (!other.canItemBeStored(resource.toStack())) continue;
+                        return 0;
+                    }
+                }
+            }
 
             int inserted = super.insert(index, resource, amount, transaction);
 

@@ -41,49 +41,9 @@ public class DrawerOverlay {
     }
 
     private void addContent(final List<Component> result, final BlockEntityDrawers tile, final IDrawerAttributes attr) {
-        if (!this.showContent || attr.isConcealed()) return;
-        final boolean showCounts = !this.respectQuantifyKey || attr.isShowingQuantity();
-
-        final IDrawerGroup group = tile.getGroup();
-        if (group == null)
-            return;
-
-        for (int i = 0; i < group.getDrawerCount(); i++) {
-            final IDrawer drawer = group.getDrawer(i);
-            if (!drawer.isEnabled())
-                continue;
-
-            Component name = Component.translatable("tooltip.storagedrawers.waila.empty");
-
-            final ItemStack stack = drawer.getStoredItemPrototype();
-            if (!stack.isEmpty()) {
-                final MutableComponent stackName = Component.translatable("").append(stack.getDisplayName());
-
-                if (showCounts) {
-                    if (drawer.getStoredItemCount() == Integer.MAX_VALUE) {
-                        name = stackName.append("[\u221E]");
-                    } else if (drawer instanceof IFractionalDrawer && ((IFractionalDrawer) drawer).getConversionRate() > 1) {
-                        final String text = ((i == 0) ? " [" : " [+") + ((IFractionalDrawer) drawer).getStoredItemRemainder() + "]";
-                        name = stackName.append(text);
-                    } else if (this.showStackRemainder) {
-                        final int stackSize = Math.max(1, drawer.getStoredItemStackSize());
-                        final int stacks = drawer.getStoredItemCount() / stackSize;
-                        final int remainder = drawer.getStoredItemCount() % stackSize;
-                        if (stacks > 0 && remainder > 0)
-                            name = stackName.append(" [" + stacks + "x" + stackSize + " + " + remainder + "]");
-                        else if (stacks > 0)
-                            name = stackName.append(" [" + stacks + "x" + stackSize + "]");
-                        else
-                            name = stackName.append(" [" + remainder + "]");
-                    } else
-                        name = stackName.append(" [" + drawer.getStoredItemCount() + "]");
-                } else {
-                    name = stackName;
-                }
-            }
-            result.add(Component.translatable("tooltip.storagedrawers.waila.drawer", i + 1, name));
-        }
-
+        // ponytail: Content now rendered as native Jade item icon grid via IServerExtensionProvider<ViewGroup<ItemStack>>
+        // (Waila.DrawerItemStorageProvider). Keep text line suppressed to avoid duplicate "#1: [Item]" lines.
+        // If that provider is disabled or Jade absent, capacity/status lines below still show.
     }
 
     private void addStackLimit(List<Component> result, BlockEntityDrawers tile, IDrawerAttributes attr) {
