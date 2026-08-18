@@ -9,8 +9,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
-public class PlatformCapabilities
-{
+public class PlatformCapabilities {
     public static final ChameleonCapability<ResourceHandler<ItemResource>> ITEM_HANDLER =
         new NeoforgeCapability<>(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK);
 
@@ -26,16 +25,19 @@ public class PlatformCapabilities
             cast(Capabilities.ITEM_HANDLER).register(event, entity, (e, c) -> new DrawerItemHandler(e));
 
             cast(ITEM_HANDLER).register(event, entity, (e, c) -> DrawerGroupResourceHandler.of(e));
+            event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, entity.get(), (e, c) -> new PlatformDrawerItemHandler(e));
         });
 
         cast(Capabilities.DRAWER_GROUP).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> e.getItemRepository());
         cast(Capabilities.ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> new DrawerItemHandler(e));
         cast(ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER.get(), (e, c) -> DrawerGroupResourceHandler.of(e));
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, ModBlockEntities.CONTROLLER.get(), (e, c) -> new PlatformDrawerItemHandler(e));
 
         cast(Capabilities.DRAWER_GROUP).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> e.getItemRepository());
         cast(Capabilities.ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> new DrawerItemHandler(e));
         cast(ITEM_HANDLER).register(event, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> DrawerGroupResourceHandler.of(e));
+        event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, ModBlockEntities.CONTROLLER_IO.get(), (e, c) -> new PlatformDrawerItemHandler(e));
     }
 }
