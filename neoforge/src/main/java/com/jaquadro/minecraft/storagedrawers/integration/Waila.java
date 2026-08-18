@@ -1,6 +1,8 @@
 package com.jaquadro.minecraft.storagedrawers.integration;
 
 import com.jaquadro.minecraft.storagedrawers.StorageDrawers;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 import com.jaquadro.minecraft.storagedrawers.block.BlockDrawers;
 import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityDrawers;
 import com.jaquadro.minecraft.storagedrawers.config.ModClientConfig;
@@ -94,8 +96,30 @@ public class Waila implements IWailaPlugin
             if (!(accessor.getBlockEntity() instanceof BlockEntityDrawers blockEntityDrawers))
                 return;
 
+            boolean showContent = config.get(StorageDrawers.rl("display.content"));
+            IDrawerGroup group = blockEntityDrawers.getGroup();
+            if (showContent && group != null) {
+                boolean first = true;
+                for (int i = 0; i < group.getDrawerCount(); i++) {
+                    IDrawer drawer = group.getDrawer(i);
+                    if (!drawer.isEnabled() || drawer.isEmpty())
+                        continue;
+                    ItemStack proto = drawer.getStoredItemPrototype();
+                    if (proto.isEmpty())
+                        continue;
+                    ItemStack stack = proto.copyWithCount(drawer.getStoredItemCount());
+                    Element itemElement = ItemStackElement.of(stack);
+                    if (first) {
+                        currenttip.add(itemElement);
+                        first = false;
+                    } else {
+                        currenttip.append(itemElement);
+                    }
+                }
+            }
+
             DrawerOverlay overlay = new DrawerOverlay();
-            overlay.showContent = config.get(StorageDrawers.rl("display.content"));
+            overlay.showContent = showContent;
             overlay.showStackLimit = config.get(StorageDrawers.rl("display.stacklimit"));
             overlay.showStatus = config.get(StorageDrawers.rl("display.status"));
 
