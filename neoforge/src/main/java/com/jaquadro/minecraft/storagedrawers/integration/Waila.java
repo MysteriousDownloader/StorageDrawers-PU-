@@ -7,7 +7,7 @@ import com.jaquadro.minecraft.storagedrawers.config.ModClientConfig;
 import com.jaquadro.minecraft.storagedrawers.config.ModCommonConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
@@ -48,7 +48,13 @@ public class Waila implements IWailaPlugin
     {
         @Override
         public List<ViewGroup<ItemStack>> getGroups (Accessor<?> accessor) {
-            if (!(accessor.getTarget() instanceof BlockEntityDrawers tile))
+            BlockEntity blockEntity = null;
+            if (accessor instanceof BlockAccessor blockAccessor)
+                blockEntity = blockAccessor.getBlockEntity();
+            else if (accessor.getTarget() instanceof BlockEntity be)
+                blockEntity = be;
+
+            if (!(blockEntity instanceof BlockEntityDrawers tile))
                 return List.of();
 
             var group = tile.getGroup();
@@ -85,7 +91,8 @@ public class Waila implements IWailaPlugin
 
         @Override
         public void appendTooltip (ITooltip currenttip, BlockAccessor accessor, IPluginConfig config) {
-            BlockEntityDrawers blockEntityDrawers = (BlockEntityDrawers) accessor.getBlockEntity();
+            if (!(accessor.getBlockEntity() instanceof BlockEntityDrawers blockEntityDrawers))
+                return;
 
             DrawerOverlay overlay = new DrawerOverlay();
             overlay.showContent = config.get(StorageDrawers.rl("display.content"));
