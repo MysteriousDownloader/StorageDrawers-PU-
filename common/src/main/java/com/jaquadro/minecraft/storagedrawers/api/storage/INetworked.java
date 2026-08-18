@@ -26,4 +26,21 @@ public interface INetworked
     default void unbindControlGroup () { }
 
     default void scheduleValidation () { }
+
+    default boolean isBoundToActiveController () {
+        IControlGroup bound = getBoundControlGroup();
+        if (bound != null) {
+            IDrawerGroup dg = bound.getDrawerGroup();
+            if (dg != null && dg.isGroupValid())
+                return true;
+        }
+        for (IControlGroup group : getSoftBoundControlGroups()) {
+            if (group != null) {
+                IDrawerGroup dg = group.getDrawerGroup();
+                if (dg != null && dg.isGroupValid())
+                    return true;
+            }
+        }
+        return false;
+    }
 }
