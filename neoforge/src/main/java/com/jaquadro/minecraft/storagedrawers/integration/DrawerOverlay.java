@@ -26,6 +26,8 @@ public class DrawerOverlay {
 
     public List<Component> getOverlay(final BlockEntityDrawers tile) {
         final List<Component> result = new ArrayList<>();
+        if (tile == null)
+            return result;
 
         IDrawerAttributes attr = tile.getCapability(Capabilities.DRAWER_ATTRIBUTES);
         if (attr == null)
@@ -43,6 +45,9 @@ public class DrawerOverlay {
         final boolean showCounts = !this.respectQuantifyKey || attr.isShowingQuantity();
 
         final IDrawerGroup group = tile.getGroup();
+        if (group == null)
+            return;
+
         for (int i = 0; i < group.getDrawerCount(); i++) {
             final IDrawer drawer = group.getDrawer(i);
             if (!drawer.isEnabled())
@@ -61,12 +66,13 @@ public class DrawerOverlay {
                         final String text = ((i == 0) ? " [" : " [+") + ((IFractionalDrawer) drawer).getStoredItemRemainder() + "]";
                         name = stackName.append(text);
                     } else if (this.showStackRemainder) {
-                        final int stacks = drawer.getStoredItemCount() / drawer.getStoredItemStackSize();
-                        final int remainder = drawer.getStoredItemCount() - (stacks * drawer.getStoredItemStackSize());
+                        final int stackSize = Math.max(1, drawer.getStoredItemStackSize());
+                        final int stacks = drawer.getStoredItemCount() / stackSize;
+                        final int remainder = drawer.getStoredItemCount() % stackSize;
                         if (stacks > 0 && remainder > 0)
-                            name = stackName.append(" [" + stacks + "x" + drawer.getStoredItemStackSize() + " + " + remainder + "]");
+                            name = stackName.append(" [" + stacks + "x" + stackSize + " + " + remainder + "]");
                         else if (stacks > 0)
-                            name = stackName.append(" [" + stacks + "x" + drawer.getStoredItemStackSize() + "]");
+                            name = stackName.append(" [" + stacks + "x" + stackSize + "]");
                         else
                             name = stackName.append(" [" + remainder + "]");
                     } else

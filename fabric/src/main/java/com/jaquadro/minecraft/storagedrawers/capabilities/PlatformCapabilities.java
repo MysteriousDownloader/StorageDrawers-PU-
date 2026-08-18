@@ -37,22 +37,17 @@ public class PlatformCapabilities
             cast(Capabilities.DRAWER_GROUP).register(entity, e -> BlockEntityDrawers.getGroup(e));
             cast(Capabilities.ITEM_REPOSITORY).register(entity, DrawerItemRepository::new);
             cast(Capabilities.ITEM_HANDLER).register(entity, DrawerItemHandler::new);
+            ItemStorage.SIDED.registerForBlockEntity((e, dir) -> e.isBoundToActiveController() ? null : DrawerStorageImpl.of(e), entity);
         });
 
         cast(Capabilities.DRAWER_GROUP).register(ModBlockEntities.CONTROLLER.get(), e -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(ModBlockEntities.CONTROLLER.get(), BlockEntityController::getItemRepository);
         cast(Capabilities.ITEM_HANDLER).register(ModBlockEntities.CONTROLLER.get(), DrawerItemHandler::new);
+        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> DrawerStorageImpl.of(entity), ModBlockEntities.CONTROLLER.get());
 
         cast(Capabilities.DRAWER_GROUP).register(ModBlockEntities.CONTROLLER_IO.get(), e -> e);
         cast(Capabilities.ITEM_REPOSITORY).register(ModBlockEntities.CONTROLLER_IO.get(), BlockEntityControllerIO::getItemRepository);
         cast(Capabilities.ITEM_HANDLER).register(ModBlockEntities.CONTROLLER_IO.get(), DrawerItemHandler::new);
-
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> entity.isBoundToActiveController() ? null : DrawerStorageImpl.of(entity), ModBlockEntities.STANDARD_DRAWERS_1.get());
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> entity.isBoundToActiveController() ? null : DrawerStorageImpl.of(entity), ModBlockEntities.STANDARD_DRAWERS_2.get());
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> entity.isBoundToActiveController() ? null : DrawerStorageImpl.of(entity), ModBlockEntities.STANDARD_DRAWERS_4.get());
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> entity.isBoundToActiveController() ? null : DrawerStorageImpl.of(entity), ModBlockEntities.FRACTIONAL_DRAWERS_2.get());
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> entity.isBoundToActiveController() ? null : DrawerStorageImpl.of(entity), ModBlockEntities.FRACTIONAL_DRAWERS_3.get());
-        ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> DrawerStorageImpl.of(entity), ModBlockEntities.CONTROLLER.get());
         ItemStorage.SIDED.registerForBlockEntity((entity, dir) -> DrawerStorageImpl.of(entity), ModBlockEntities.CONTROLLER_IO.get());
     }
 }
