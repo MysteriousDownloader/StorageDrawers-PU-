@@ -3,7 +3,12 @@ package com.jaquadro.minecraft.storagedrawers.inventory;
 import com.google.common.collect.MapMaker;
 import com.jaquadro.minecraft.storagedrawers.api.storage.Drawers;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerAttributes;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
+import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityController;
+import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityControllerIO;
+import com.jaquadro.minecraft.storagedrawers.block.tile.BlockEntityDrawers;
+import com.jaquadro.minecraft.storagedrawers.capabilities.Capabilities;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
@@ -56,6 +61,20 @@ public class DrawerStorageImpl extends CombinedStorage<ItemVariant, SingleSlotSt
     }
 
     @Override
+    public long getVersion () {
+        if (group instanceof BlockEntityController controller)
+            return controller.getStorageVersion();
+        if (group instanceof BlockEntityControllerIO controllerIO) {
+            BlockEntityController controller = controllerIO.getController();
+            if (controller != null)
+                return controller.getStorageVersion();
+        }
+        if (group instanceof BlockEntityDrawers drawers)
+            return drawers.getStorageVersion();
+        return super.getVersion();
+    }
+
+    @Override
     public int getSlotCount () {
         return getSlots().size();
     }
@@ -70,6 +89,21 @@ public class DrawerStorageImpl extends CombinedStorage<ItemVariant, SingleSlotSt
             return Drawers.DISABLED;
 
         return group.getDrawer(slot);
+    }
+
+    private boolean checkControllerVoid (BlockEntityController controller, int slot) {
+        if (controller == null)
+            return false;
+        IDrawer drawer = getDrawer(slot);
+        if (drawer == null || !drawer.isEnabled())
+            return false;
+        IDrawerGroup drawerGroup = controller.getGroupForDrawerSlot(slot);
+        if (drawerGroup == null)
+            return false;
+        IDrawerAttributes attrs = drawerGroup.getCapability(Capabilities.DRAWER_ATTRIBUTES);
+        if (attrs == null && drawerGroup instanceof BlockEntityDrawers bed)
+            attrs = bed.getDrawerAttributes();
+        return attrs != null && attrs.isVoid();
     }
 
     @Override
@@ -97,7 +131,7 @@ public class DrawerStorageImpl extends CombinedStorage<ItemVariant, SingleSlotSt
         }
         if (remaining == 0) return insertedTotal;
 
-        // Pass 2: locked empty drawers that accept this item
+        // Pass 2: locked empty drawers (isLockedEmpty) matching item
         for (SingleSlotStorage<ItemVariant> slot : parts) {
             if (remaining == 0) break;
             if (!(slot instanceof DrawerStackStorage dss)) continue;
@@ -124,7 +158,56 @@ public class DrawerStorageImpl extends CombinedStorage<ItemVariant, SingleSlotSt
         }
         if (remaining == 0) return insertedTotal;
 
-        // Pass 3: unlocked empty drawers (catch-all)
+        // Pass 3: matching drawers with Void Upgrade (void excess items rather than filling empty drawers)
+        for (SingleSlotStorage<ItemVariant> slot : parts) {
+            if (remaining == 0) break;
+            if (!(slot instanceof DrawerStackStorage dss)) continue;
+            IDrawer drawer = getDrawer(dss.slot);
+            if (drawer.isEmpty()) continue;
+            if (!drawer.canItemBeStored(resource.toStack())) continue;
+            boolean hasVoid = false;
+            if (group instanceof BlockEntityController controller) {
+                hasVoid = checkControllerVoid(controller, dss.slot);
+            } else if (group instanceof BlockEntityControllerIO controllerIO) {
+                hasVoid = checkControllerVoid(controllerIO.getController(), dss.slot);
+            } else if (group instanceof BlockEntityDrawers drawers) {
+                IDrawerAttributes attrs = drawers.getDrawerAttributes();
+                if (attrs == null)
+                    attrs = group.getCapability(Capabilities.DRAWER_ATTRIBUTES);
+                if (attrs != null)
+                    hasVoid = attrs.isVoid();
+                if (!hasVoid) {
+                    var da = drawer.getAttributes();
+                    if (da instanceof IDrawerAttributes ida)
+                        hasVoid = ida.isVoid();
+                    else if (da != null)
+                        hasVoid = da.isVoid();
+                }
+            } else {
+                IDrawerAttributes attrs = group.getCapability(Capabilities.DRAWER_ATTRIBUTES);
+                if (attrs != null)
+                    hasVoid = attrs.isVoid();
+                else {
+                    var da = drawer.getAttributes();
+                    if (da instanceof IDrawerAttributes ida)
+                        hasVoid = ida.isVoid();
+                }
+            }
+            if (!hasVoid) continue;
+            // Void the remaining excess - consider it inserted rather than filling empty drawers
+            long inserted = slot.insert(resource, remaining, transaction);
+            insertedTotal += inserted;
+            remaining -= inserted;
+            if (remaining > 0) {
+                // Drawer is full but has void upgrade, void the rest
+                insertedTotal += remaining;
+                remaining = 0;
+            }
+            break;
+        }
+        if (remaining == 0) return insertedTotal;
+
+        // Pass 4: unlocked empty drawers (not isLockedEmpty)
         for (SingleSlotStorage<ItemVariant> slot : parts) {
             if (remaining == 0) break;
             if (!(slot instanceof DrawerStackStorage dss)) continue;

@@ -39,6 +39,11 @@ public class DrawerStackStorage extends SingleStackStorage
     }
 
     @Override
+    public long getVersion () {
+        return storage.getVersion();
+    }
+
+    @Override
     protected ItemStack getStack () {
         IDrawer drawer = storage.getDrawer(slot);
         return drawer.getStoredItemPrototype().copyWithCount(drawer.getStoredItemCount());
@@ -89,6 +94,22 @@ public class DrawerStackStorage extends SingleStackStorage
         return attrs != null && attrs.isVoid();
     }
 
+    private boolean checkControllerVoidForSlot (BlockEntityController controller, int drawerSlot) {
+        if (controller == null)
+            return false;
+
+        IDrawer drawer = storage.getDrawer(drawerSlot);
+        if (drawer == null || !drawer.isEnabled())
+            return false;
+
+        IDrawerGroup drawerGroup = controller.getGroupForDrawerSlot(drawerSlot);
+        if (drawerGroup == null)
+            return false;
+
+        IDrawerAttributes attrs = getDrawerAttributes(drawerGroup);
+        return attrs != null && attrs.isVoid();
+    }
+
     @Override
     public long insert (ItemVariant insertedVariant, long maxAmount, TransactionContext transaction) {
         if (storage.getDrawer(slot).getAttributes().isSuspended())
@@ -108,10 +129,39 @@ public class DrawerStackStorage extends SingleStackStorage
                 for (int i = 0; i < g.getDrawerCount(); i++) {
                     if (i == slot) continue;
                     IDrawer other = g.getDrawer(i);
-                    if (other.isEmpty() || !other.isEnabled()) continue;
-                    if (other.getRemainingCapacity() <= 0) continue;
+                    if (other == null || !other.isEnabled()) continue;
                     if (!other.canItemBeStored(insertedVariant.toStack())) continue;
-                    return 0;
+
+                    // Defer if another populated drawer has remaining capacity
+                    if (!other.isEmpty() && other.getRemainingCapacity() > 0) {
+                        return 0;
+                    }
+
+                    // Defer if another drawer is empty but isLockedEmpty
+                    if (other.isEmpty()) {
+                        var otherAttrs = other.getAttributes();
+                        boolean otherLockedEmpty = otherAttrs != null && otherAttrs.isItemLocked(com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute.LOCK_EMPTY);
+                        if (otherLockedEmpty) {
+                            return 0;
+                        }
+                    }
+
+                    // Defer if another populated drawer has a Void Upgrade
+                    if (!other.isEmpty()) {
+                        boolean isVoid = false;
+                        var otherAttrs = other.getAttributes();
+                        if (otherAttrs != null && otherAttrs.isVoid()) {
+                            isVoid = true;
+                        } else if (storage.group instanceof BlockEntityController) {
+                            isVoid = checkControllerVoidForSlot((BlockEntityController) storage.group, i);
+                        } else if (storage.group instanceof BlockEntityControllerIO) {
+                            BlockEntityController controller = ((BlockEntityControllerIO) storage.group).getController();
+                            isVoid = checkControllerVoidForSlot(controller, i);
+                        }
+                        if (isVoid) {
+                            return 0;
+                        }
+                    }
                 }
             }
         }

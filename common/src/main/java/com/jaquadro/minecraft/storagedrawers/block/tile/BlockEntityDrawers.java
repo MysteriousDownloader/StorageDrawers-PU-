@@ -79,6 +79,20 @@ public abstract class BlockEntityDrawers extends BaseBlockEntity implements IDra
 
     private final Set<IControlGroup> softBoundControlGroups = new HashSet<>();
 
+    private long storageVersion = 0;
+
+    public long getStorageVersion () {
+        return storageVersion;
+    }
+
+    public void bumpStorageVersion () {
+        storageVersion++;
+        for (IControlGroup group : softBoundControlGroups) {
+            if (group instanceof BlockEntityController controller)
+                controller.bumpStorageVersion();
+        }
+    }
+
     //public final ControllerData controllerData = new ControllerData();
 
     //private int direction;
@@ -799,6 +813,7 @@ public abstract class BlockEntityDrawers extends BaseBlockEntity implements IDra
 
     @Override
     public void setChanged () {
+        bumpStorageVersion();
         if (isRedstone() && getLevel() != null) {
             getLevel().updateNeighborsAt(getBlockPos(), getBlockState().getBlock());
             getLevel().updateNeighborsAt(getBlockPos().below(), getBlockState().getBlock());

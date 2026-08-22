@@ -175,6 +175,27 @@ public class BlockEntityController extends BaseBlockEntity implements IDrawerGro
         return PRI_NORMAL;
     }
 
+    private long storageVersion = 0;
+
+    public long getStorageVersion () {
+        return storageVersion;
+    }
+
+    public void bumpStorageVersion () {
+        storageVersion++;
+    }
+
+    @Override
+    public Collection<BlockPos> getConnectedDrawerPositions () {
+        return Collections.unmodifiableSet(storage.keySet());
+    }
+
+    @Override
+    public void setChanged () {
+        bumpStorageVersion();
+        super.setChanged();
+    }
+
     private final Map<BlockPos, StorageRecord> storage = new HashMap<>();
     protected List<SlotRecord> drawerSlotList = new ArrayList<>();
 

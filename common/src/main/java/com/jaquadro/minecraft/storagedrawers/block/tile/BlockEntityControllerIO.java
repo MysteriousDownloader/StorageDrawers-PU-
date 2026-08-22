@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class BlockEntityControllerIO extends BaseBlockEntity implements IDrawerGroup, IControlGroup, IFramedBlockEntity, RenderDataProvider
+public class BlockEntityControllerIO extends BaseBlockEntity implements IDrawerGroup, IControlGroup, INetworked, IFramedBlockEntity, RenderDataProvider
 {
     private static final int[] drawerSlots = new int[]{0};
 
@@ -70,6 +70,15 @@ public class BlockEntityControllerIO extends BaseBlockEntity implements IDrawerG
             return null;
 
         return controller;
+    }
+
+    @Override
+    public java.util.Collection<net.minecraft.core.BlockPos> getConnectedDrawerPositions () {
+        BlockEntityController controller = getController();
+        if (controller == null || !controller.isValidIO(getBlockPos()))
+            return java.util.Collections.emptyList();
+
+        return controller.getConnectedDrawerPositions();
     }
 
     @Override

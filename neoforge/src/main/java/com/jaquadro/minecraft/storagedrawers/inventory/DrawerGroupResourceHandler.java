@@ -217,6 +217,22 @@ public class DrawerGroupResourceHandler implements ResourceHandler<ItemResource>
             return attrs != null && attrs.isVoid();
         }
 
+        private boolean checkControllerVoidForSlot (BlockEntityController controller, int drawerSlot) {
+            if (controller == null)
+                return false;
+
+            IDrawer drawer = group.getDrawer(drawerSlot);
+            if (drawer == null || !drawer.isEnabled())
+                return false;
+
+            IDrawerGroup controllerGroup = controller.getGroupForDrawerSlot(drawerSlot);
+            if (controllerGroup == null)
+                return false;
+
+            IDrawerAttributes attrs = getDrawerAttributes(controllerGroup);
+            return attrs != null && attrs.isVoid();
+        }
+
         @Override
         public int insert (int index, ItemResource resource, int amount, TransactionContext transaction) {
             if (!isGroupValid())
@@ -234,10 +250,31 @@ public class DrawerGroupResourceHandler implements ResourceHandler<ItemResource>
                     for (int i = 0; i < group.getDrawerCount(); i++) {
                         if (i == slot) continue;
                         IDrawer other = group.getDrawer(i);
-                        if (other.isEmpty() || !other.isEnabled()) continue;
-                        if (other.getRemainingCapacity() <= 0) continue;
-                        if (!other.canItemBeStored(resource.toStack())) continue;
-                        return 0;
+                        if (other == null || !other.isEnabled())
+                            continue;
+                        if (!other.canItemBeStored(resource.toStack()))
+                            continue;
+                        if (!other.isEmpty()) {
+                            if (other.getRemainingCapacity() > 0)
+                                return 0;
+                            boolean isVoid;
+                            if (group instanceof BlockEntityController controller)
+                                isVoid = checkControllerVoidForSlot(controller, i);
+                            else if (group instanceof BlockEntityControllerIO controllerIO) {
+                                BlockEntityController controller = controllerIO.getController();
+                                isVoid = checkControllerVoidForSlot(controller, i);
+                            } else {
+                                IDrawerAttributes attr = getDrawerAttributes(group);
+                                isVoid = attr != null && attr.isVoid();
+                            }
+                            if (isVoid)
+                                return 0;
+                        } else {
+                            var otherAttrs = other.getAttributes();
+                            boolean otherLockedEmpty = otherAttrs != null && otherAttrs.isItemLocked(com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute.LOCK_EMPTY);
+                            if (otherLockedEmpty)
+                                return 0;
+                        }
                     }
                 }
             }
