@@ -41,6 +41,10 @@ public class DrawerStorageImpl extends CombinedStorage<ItemVariant, SingleSlotSt
         backingList = new ArrayList<>();
     }
 
+    public IDrawerGroup getGroup () {
+        return group;
+    }
+
     @Override
     public @UnmodifiableView List<SingleSlotStorage<ItemVariant>> getSlots () {
         return parts;

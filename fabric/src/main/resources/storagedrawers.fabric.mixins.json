@@ -1,0 +1,14 @@
+{
+  "required": false,
+  "package": "com.jaquadro.minecraft.storagedrawers.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.jaquadro.minecraft.storagedrawers.mixin.StorageDrawersMixinPlugin",
+  "mixins": [
+    "toms_storage.BlockInventoryAccessMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

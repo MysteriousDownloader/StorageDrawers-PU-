@@ -32,5 +32,7 @@
         "minecraft": ">=${minecraft_version_lower} <${minecraft_version_upper}"
     },
     "custom": {},
-    "mixins": []
+    "mixins": [
+        "storagedrawers.fabric.mixins.json"
+    ]
 }
