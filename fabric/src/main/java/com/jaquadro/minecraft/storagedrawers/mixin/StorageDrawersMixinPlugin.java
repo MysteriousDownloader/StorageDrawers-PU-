@@ -33,5 +33,11 @@ public class StorageDrawersMixinPlugin implements IMixinConfigPlugin {
     public void preApply(String targetClassName, ClassNode targetClass, String mixinPackage, IMixinInfo mixinInfo) {}
 
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinPackage, IMixinInfo mixinInfo) {}
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinPackage, IMixinInfo mixinInfo) {
+        if (targetClassName != null && targetClassName.contains("BlockInventoryAccess")) {
+            if (!targetClass.interfaces.contains("com/tom/storagemod/util/Priority")) {
+                targetClass.interfaces.add("com/tom/storagemod/util/Priority");
+            }
+        }
+    }
 }
