@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "com.jaquadro.minecraft.storagedrawers.mixin.StorageDrawersMixinPlugin",
   "mixins": [
-    "toms_storage.BlockInventoryAccessMixin"
+    "toms_storage.BlockInventoryAccessMixin",
+    "toms_storage.InventoryCableMixin"
   ],
   "client": [],
   "server": [],
