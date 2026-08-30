@@ -12,6 +12,7 @@ loom {
 
 dependencies {
     minecraft("com.mojang:minecraft:${Versions.minecraft}")
+    compileOnly("net.fabricmc:fabric-loader:${Versions.fabricLoader}")
 }
 
 configurations {
