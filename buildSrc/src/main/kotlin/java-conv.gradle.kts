@@ -101,11 +101,6 @@ tasks {
             "minecraft_version_range" to Versions.minecraftRange,
             "minecraft_version_lower" to Versions.minecraftLower,
             "minecraft_version_upper" to Versions.minecraftUpper,
-            "neo_version" to Versions.neoForge,
-            "neo_version_range" to Versions.neoForgeVersionRange,
-            "forge_version" to Versions.forge,
-            "forge_version_range" to Versions.forgeVersionRange,
-            "loader_version_range" to Versions.neoForgeLoaderRange,
             "fabric_version" to Versions.fabric,
             "fabric_loader" to Versions.fabricLoader,
             "fabric_loader_min" to Versions.fabricLoaderMin,
@@ -123,7 +118,7 @@ tasks {
             "mod_description" to Properties.description,
         )
         inputs.properties(properties)
-        filesMatching(setOf("fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "pack.mcmeta")) {
+        filesMatching(setOf("fabric.mod.json", "pack.mcmeta")) {
             expand(properties)
         }
     }

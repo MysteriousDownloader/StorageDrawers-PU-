@@ -21,5 +21,4 @@ plugins {
 
 rootProject.name = "StorageDrawers"
 include("common")
-include("neoforge")
 include("fabric")
